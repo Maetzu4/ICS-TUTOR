@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TEAM4 · Guía y Checklist ICS + QA (Kodland)</title>
+  <meta name="description" content="Herramienta interactiva para tutores Kodland: sube tu In-Class Score (ICS), supera auditorías QA y maximiza la retención en tus clases.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Header principal con identidad Kodland -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-badge">TEAM 4</div>
+        <div class="brand-info">
+          <h1>Guía & Checklist ICS + QA <span class="tag-kodland">KODLAND</span></h1>
+          <p class="brand-subtitle">Optimización de In-Class Score, retención y excelencia pedagógica</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="quick-status">
+          <span class="status-indicator"></span>
+          <span class="status-text" id="headerStatusText">Modo activo: En vivo</span>
+        </div>
+        <button id="btnQuickRescueToggle" class="btn-rescue-trigger" title="Abrir rescate en vivo">
+          <span class="icon">⚡</span> Acciones de Rescate
+        </button>
+      </div>
+    </div>
+
+    <!-- Navegación por pestañas -->
+    <nav class="main-nav">
+      <div class="nav-container">
+        <button class="nav-tab active" data-tab="tab-checklist">
+          <span class="tab-icon">📋</span>
+          <span class="tab-label">Checklist de Clase</span>
+          <span class="tab-badge" id="navChecklistBadge">0%</span>
+        </button>
+        <button class="nav-tab" data-tab="tab-guide">
+          <span class="tab-icon">🚀</span>
+          <span class="tab-label">Cómo subir mi ICS</span>
+        </button>
+        <button class="nav-tab" data-tab="tab-history">
+          <span class="tab-icon">📊</span>
+          <span class="tab-label">Mi Historial y Seguimiento</span>
+          <span class="tab-counter" id="navHistoryCount">0</span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Contenedor Principal -->
+  <main class="main-layout">
+    
+    <!-- PESTAÑA 1: CHECKLIST DE CLASE -->
+    <section id="tab-checklist" class="tab-pane active">
+      <div class="checklist-grid">
+        
+        <!-- Columna Principal: Contenido del Checklist -->
+        <div class="checklist-content">
+          
+          <!-- Barra de Control de Sesión -->
+          <div class="session-control-card">
+            <div class="session-type-selector">
+              <label for="sessionTypeSelect" class="control-label">
+                <span class="icon">🎯</span> Tipo de Sesión:
+              </label>
+              <select id="sessionTypeSelect" class="form-select">
+                <option value="normal">Clase normal (Sesión regular de avance)</option>
+                <option value="graduation">Graduación (Presentación final de proyectos)</option>
+                <option value="codegame">Code & Game (Sesión dinámica de retos y juegos)</option>
+              </select>
+            </div>
+
+            <div class="session-metadata">
+              <input type="text" id="sessionGroupInput" class="form-input" placeholder="Ej. Grupo Python Martes 17:00 / Mateo Gómez" />
+              <button id="btnResetChecklist" class="btn-secondary" title="Reiniciar checklist actual">
+                <span class="icon">🔄</span> Reiniciar
+              </button>
+              <button id="btnSaveSession" class="btn-primary" title="Guardar resultado en historial">
+                <span class="icon">💾</span> Guardar en Historial
+              </button>
+            </div>
+          </div>
+
+          <!-- Medidor de ICS en Tiempo Real -->
+          <div class="ics-meter-card">
+            <div class="ics-meter-header">
+              <div>
+                <h3 class="meter-title">Estimación de Cumplimiento ICS en Clase</h3>
+                <p class="meter-subtitle">Puntuación ponderada según criterios QA de participación, retención y estructura</p>
+              </div>
+              <div class="ics-score-display">
+                <span class="score-number" id="icsScoreNumber">0%</span>
+                <span class="score-status" id="icsScoreStatus">Por iniciar</span>
+              </div>
+            </div>
+
+            <div class="progress-track">
+              <div class="progress-bar" id="icsProgressBar" style="width: 0%;"></div>
+            </div>
+
+            <div class="metrics-breakdown">
+              <div class="metric-pill pill-cumple">
+                <span class="dot"></span> Cumple: <strong id="countCumple">0</strong>
+              </div>
+              <div class="metric-pill pill-parcial">
+                <span class="dot"></span> Parcial: <strong id="countParcial">0</strong>
+              </div>
+              <div class="metric-pill pill-nocumple">
+                <span class="dot"></span> No cumple: <strong id="countNoCumple">0</strong>
+              </div>
+              <div class="metric-pill pill-noaplica">
+                <span class="dot"></span> N/A: <strong id="countNoAplica">0</strong>
+              </div>
+              <div class="metric-pill pill-total">
+                <span>Total Criterios: <strong id="countTotal">0</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filtros de búsqueda rápida de criterios -->
+          <div class="criteria-filter-bar">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="criteriaSearchInput" placeholder="Buscar por palabra clave, criterio o pregunta..." />
+            </div>
+            <div class="filter-pills">
+              <button class="filter-btn active" data-filter="all">Todos</button>
+              <button class="filter-btn" data-filter="pending">Pendientes</button>
+              <button class="filter-btn" data-filter="completed">Completados</button>
+            </div>
+          </div>
+
+          <!-- Lista de Criterios Interactivos -->
+          <div id="criteriaListContainer" class="criteria-list">
+            <!-- Renderizado dinámico desde app.js -->
+          </div>
+
+        </div>
+
+        <!-- Columna Lateral: Panel de Acciones Rápidas de Rescate en Vivo -->
+        <aside class="rescue-sidebar" id="rescueSidebar">
+          <div class="rescue-sidebar-header">
+            <div class="rescue-title-wrapper">
+              <span class="rescue-icon">⚡</span>
+              <div>
+                <h3>Rescate en Vivo</h3>
+                <p>Respuestas inmediatas a imprevistos</p>
+              </div>
+            </div>
+            <button id="btnCloseRescue" class="btn-close-rescue" title="Ocultar panel">&times;</button>
+          </div>
+
+          <div class="rescue-items-accordion">
+            
+            <!-- Rescate 1: Niño callado -->
+            <article class="rescue-card">
+              <header class="rescue-card-header">
+                <span class="rescue-item-icon">🤐</span>
+                <div class="rescue-item-meta">
+                  <h4>Alumno callado o distraído</h4>
+                  <span class="urgency-badge urgency-high">Prioridad Alta</span>
+                </div>
+              </header>
+              <div class="rescue-card-body">
+                <p class="rescue-strategy"><strong>Técnica del Micrófono Dorado:</strong> No preguntes "¿Entendiste?". Haz una pregunta con opción A/B o pide ayuda con un valor específico.</p>
+                <div class="rescue-phrase">
+                  <em>"¡Sofi! Necesito tu superpoder: ¿le ponemos velocidad 10 o velocidad 25 a nuestra nave?"</em>
+                </div>
+                <ul class="rescue-steps">
+                  <li>Llama por su nombre con tono amigable, sin reproches.</li>
+                  <li>Asígnale un rol de "co-creador" de una variable puntual.</li>
+                  <li>Pide confirmación por chat si le da vergüenza hablar: <em>"Escribe 1 si vamos bien o 2 si repetimos"</em>.</li>
+                </ul>
+              </div>
+            </article>
+
+            <!-- Rescate 2: Falta poco tiempo -->
+            <article class="rescue-card">
+              <header class="rescue-card-header">
+                <span class="rescue-item-icon">⏱️</span>
+                <div class="rescue-item-meta">
+                  <h4>Faltan 10 minutos para terminar</h4>
+                  <span class="urgency-badge urgency-medium">Gestión Tiempo</span>
+                </div>
+              </header>
+              <div class="rescue-card-body">
+                <p class="rescue-strategy"><strong>Corte de Emergencia & Cliffhanger:</strong> No inicies nuevo código. Asegura el guardado y despierta curiosidad.</p>
+                <div class="rescue-phrase">
+                  <em>"¡Momento épico! Frenamos aquí para ver cómo funciona. ¡En la próxima clase desbloquearemos el jefe final!"</em>
+                </div>
+                <ul class="rescue-steps">
+                  <li>Ordena guardar el archivo/proyecto inmediatamente.</li>
+                  <li>Pide a 1 o 2 alumnos mostrar su avance en 30 segundos.</li>
+                  <li>Lanza el Cliffhanger de la siguiente sesión.</li>
+                </ul>
+              </div>
+            </article>
+
+            <!-- Rescate 3: Fallos técnicos -->
+            <article class="rescue-card">
+              <header class="rescue-card-header">
+                <span class="rescue-item-icon">💻</span>
+                <div class="rescue-item-meta">
+                  <h4>Fallo técnico / No abre la plataforma</h4>
+                  <span class="urgency-badge urgency-critical">Técnico</span>
+                </div>
+              </header>
+              <div class="rescue-card-body">
+                <p class="rescue-strategy"><strong>Plan B en 60 segundos:</strong> No detengas a todo el grupo por un problema individual de carga.</p>
+                <div class="rescue-phrase">
+                  <em>"Mientras recarga tu ventana en modo incógnito, mira mi pantalla y dime qué bloque colocar."</em>
+                </div>
+                <ul class="rescue-steps">
+                  <li>Acción 1: Refrescar con Ctrl + F5 o ventana incógnito.</li>
+                  <li>Acción 2: Enviar link directo al chat de la videollamada.</li>
+                  <li>Acción 3: Si tarda, el alumno dicta el código y el tutor comparte.</li>
+                </ul>
+              </div>
+            </article>
+
+            <!-- Rescate 4: Monopolio o desorden -->
+            <article class="rescue-card">
+              <header class="rescue-card-header">
+                <span class="rescue-item-icon">🎤</span>
+                <div class="rescue-item-meta">
+                  <h4>Alumno monopoliza la palabra</h4>
+                  <span class="urgency-badge urgency-low">Moderación</span>
+                </div>
+              </header>
+              <div class="rescue-card-body">
+                <p class="rescue-strategy"><strong>Rol de Asistente Técnico:</strong> Valida su entusiasmo pero pásale el micrófono a otro.</p>
+                <div class="rescue-phrase">
+                  <em>"¡Gran aporte, Leo! Como ya tienes esa parte resuelta, serás el inspector de código de Martín. Martín, ¿cómo lo ves tú?"</em>
+                </div>
+              </div>
+            </article>
+
+          </div>
+        </aside>
+
+      </div>
+    </section>
+
+    <!-- PESTAÑA 2: CÓMO SUBIR MI ICS -->
+    <section id="tab-guide" class="tab-pane">
+      <div class="guide-container">
+        
+        <header class="guide-hero">
+          <div class="hero-text">
+            <h2>Manual Oficial Kodland: Cómo elevar tu ICS al 95%+</h2>
+            <p>El <strong>In-Class Score (ICS)</strong> mide la calidad pedagógica percibida por las familias y auditada por QA. Un ICS alto garantiza la retención mensual, alumnos motivados y mayores oportunidades de tutoría.</p>
+          </div>
+          <div class="hero-stat-card">
+            <span class="stat-big">95%</span>
+            <span class="stat-label">Meta ICS recomendada para Tutores Team 4</span>
+          </div>
+        </header>
+
+        <!-- Los 4 Pilares del ICS -->
+        <h3 class="section-heading">Los 4 Pilares Maestros del ICS</h3>
+        <div class="pillars-grid">
+          
+          <div class="pillar-card">
+            <div class="pillar-number">01</div>
+            <h4>Conexión Emocional & Energía</h4>
+            <p>Llamar a los alumnos por su nombre, celebrar pequeños logros y usar un tono positivo constante. Los niños continúan en Kodland cuando sienten que su tutor cree en ellos.</p>
+            <ul class="pillar-tips">
+              <li>Mínimo 3 menciones nominales por alumno en la clase.</li>
+              <li>Sonrisa visible y contacto visual a la cámara.</li>
+            </ul>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-number">02</div>
+            <h4>Participación Activa 70/30</h4>
+            <p>La regla de oro: 70% del tiempo los alumnos programan y hablan, 30% el tutor explica. Evita monólogos teóricos de más de 3 minutos consecutivos.</p>
+            <ul class="pillar-tips">
+              <li>Haz preguntas dirigidas con respuestas cortas.</li>
+              <li>Rotación constante de quién comparte pantalla.</li>
+            </ul>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-number">03</div>
+            <h4>Monitoreo Continuo & Cero Frustración</h4>
+            <p>Detectar bloqueos antes de que el niño se desconecte mentalmente. La frustración silenciosa es la causa #1 de abandono en cursos online.</p>
+            <ul class="pillar-tips">
+              <li>Verificación visual de pantallas cada 5 a 7 minutos.</li>
+              <li>Normalizar el error: <em>"¡El bug es nuestro mejor maestro!"</em></li>
+            </ul>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-number">04</div>
+            <h4>Estructura, Cierre y Cliffhanger</h4>
+            <p>Una clase sin cierre pierde el 40% de su impacto. El alumno debe terminar la sesión sabiendo qué logró y emocionado por lo que vendrá la próxima semana.</p>
+            <ul class="pillar-tips">
+              <li>Mini-presentación del proyecto antes de irse.</li>
+              <li>Gancho de intriga para la siguiente aventura.</li>
+            </ul>
+          </div>
+
+        </div>
+
+        <!-- Comparativa Práctica: Lo que destruye vs lo que eleva el ICS -->
+        <h3 class="section-heading">Matriz de Auditoría QA: Qué evitar vs Qué aplicar</h3>
+        <div class="comparison-table-wrapper">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th class="th-danger">🚫 Errores Críticos que bajan el ICS</th>
+                <th class="th-success">✅ Acciones Estratégicas que suben el ICS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Iniciar con silencio o hablar 10 minutos seguidos sin que los alumnos hagan nada.</td>
+                <td>Presentar la meta en 2 minutos ("Hoy programaremos...") e iniciar la práctica de inmediato.</td>
+              </tr>
+              <tr>
+                <td>Preguntar en general "¿Quién quiere participar?" (silencio incómodo).</td>
+                <td>Preguntas directas y amables: "Mateo, ayúdame a elegir si el salto es hacia arriba o hacia la derecha".</td>
+              </tr>
+              <tr>
+                <td>Ignorar a alumnos con cámara apagada o que no responden el chat.</td>
+                <td>Hacer chequeos suaves por nombre y pedir interacción lúdica por chat o emojis.</td>
+              </tr>
+              <tr>
+                <td>Resolverle el problema al alumno tomando control total de su pantalla.</td>
+                <td>Guiar con preguntas socráticas: "¿Qué bloque dice 'si toca el borde'?", dándole la victoria al niño.</td>
+              </tr>
+              <tr>
+                <td>Cortar la clase abruptamente diciendo "se acabó la hora, chau".</td>
+                <td>Cierre de 5 minutos: festejar avance, aplauso grupal y revelar el misterio de la próxima clase.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- PESTAÑA 3: MI HISTORIAL Y SEGUIMIENTO -->
+    <section id="tab-history" class="tab-pane">
+      <div class="history-container">
+        
+        <header class="history-header">
+          <div>
+            <h2>Historial de Clases & Autoevaluaciones QA</h2>
+            <p>Registro local de tus sesiones guardadas para que analices tu progreso continuo y prepares tus reuniones con QA/Team Lead.</p>
+          </div>
+          <div class="history-actions">
+            <button id="btnExportHistory" class="btn-secondary">
+              <span class="icon">📤</span> Exportar Datos (JSON)
+            </button>
+            <button id="btnClearHistory" class="btn-danger-outline">
+              <span class="icon">🗑️</span> Limpiar Historial
+            </button>
+          </div>
+        </header>
+
+        <!-- Tarjetas de métricas históricas -->
+        <div class="history-stats-grid">
+          <div class="stat-box">
+            <span class="stat-caption">Clases Registradas</span>
+            <span class="stat-value" id="statTotalClasses">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-caption">Promedio Cumplimiento ICS</span>
+            <span class="stat-value" id="statAvgScore">0%</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-caption">Sesiones al 100%</span>
+            <span class="stat-value" id="statPerfectSessions">0</span>
+          </div>
+        </div>
+
+        <!-- Tabla de Registros -->
+        <div class="history-table-card">
+          <div class="table-responsive">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>Fecha y Hora</th>
+                  <th>Grupo / Alumno</th>
+                  <th>Tipo de Sesión</th>
+                  <th>ICS Estimado</th>
+                  <th>Desglose (C/P/NC)</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody">
+                <!-- Se llena con app.js -->
+              </tbody>
+            </table>
+          </div>
+          <div id="historyEmptyState" class="empty-state">
+            <span class="empty-icon">📝</span>
+            <h4>No hay clases registradas aún</h4>
+            <p>Completa los criterios en la pestaña <strong>Checklist de Clase</strong> y presiona <strong>"Guardar en Historial"</strong> para registrar tu primera autoevaluación.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal / Drawer para Detalle de Historial -->
+  <div id="historyModal" class="modal-overlay">
+    <div class="modal-card">
+      <header class="modal-header">
+        <h3 id="modalTitle">Detalle de Sesión</h3>
+        <button id="btnModalClose" class="btn-modal-close">&times;</button>
+      </header>
+      <div class="modal-body" id="modalBody">
+        <!-- Contenido dinámico -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast de notificaciones -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Script principal -->
+  <script src="app.js"></script>
+</body>
+</html>
