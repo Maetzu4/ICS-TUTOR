@@ -4,195 +4,979 @@
  */
 
 // =============================================================================
-// 1. BANCO DE DATOS DE CRITERIOS PEDAGÓGICOS Y QA
+// 1. BANCO DE DATOS DE CRITERIOS PEDAGÓGICOS Y QA (KODLAND OFICIAL)
 // =============================================================================
 
 const CRITERIA_DATABASE = [
+  // ---------------------------------------------------------------------------
+  // A. CLASE NORMAL (10 Criterios)
+  // ---------------------------------------------------------------------------
   {
-    id: "c-inicio-puntual",
+    id: "c-norm-inicio",
     category: "Estructura y Apertura",
     title: "Inicio puntual y objetivo claro",
     description: "Conexión a tiempo, bienvenida cálida personalizada, comprobación técnica rápida y planteamiento de la meta lúdica antes del minuto 7.",
-    sessionTypes: ["normal", "graduation", "codegame"],
+    sessionTypes: ["normal"],
     questions: [
-      "¿Iniciaste la sesión en el minuto exacto programado o avisaste oportunamente si hubo un inconveniente?",
-      "¿Saludaste a cada alumno por su nombre con energía positiva y tono entusiasta?",
-      "¿Comprobaste audio, video y que todos los alumnos te escucharan y vieran correctamente?",
-      "¿Presentaste la misión/meta de la clase de manera atractiva y comprensible (\"Hoy crearemos...\")?",
-      "¿Conectaste el objetivo de hoy con la clase anterior o el proyecto final del curso?",
-      "¿Estableciste las reglas de oro de forma lúdica (levantar la mano, silenciar micrófono cuando otro habla)?",
+      "¿Iniciaste en el minuto exacto programado y saludaste a cada alumno por su nombre con energía positiva?",
+      "¿Comprobaste que audio, video y pantalla compartida funcionaran en todos los alumnos antes del minuto 4?",
+      "¿Presentaste la misión y el objetivo tangible del día ('Hoy crearemos...') de manera comprensible antes del minuto 7?",
+      "¿Recordaste las reglas de oro de forma lúdica (levantar la mano, silenciar micrófono cuando otro habla)?",
       "¿Iniciaste la primera actividad práctica o rompehielos antes del minuto 7 de la clase?"
     ],
     keywords: [
-      "¡Bienvenidos a la misión!",
-      "Meta de hoy",
-      "Audio y video listos",
-      "Reglas de oro",
-      "Superhéroes del código",
-      "Puntos y estrellas",
-      "Encendemos motores",
-      "Reto del día",
-      "Paso a paso"
+      "INICIO_PUNTUAL",
+      "OBJETIVO_CLARO",
+      "ONBOARDING_TECNICO",
+      "REGLAS_DE_ORO",
+      "ENERGIA_INICIAL"
     ],
+    tipICS: "Un inicio puntual y con objetivo explícito reduce el riesgo de abandono temprano; el algoritmo ICS penaliza fuertemente inicios tardíos o silenciosos en los primeros 5 minutos donde se define la tasa de retención.",
+    templates: {
+      cumple: "Inicio a tiempo con 100% de asistencia verificada. Objetivo presentado con entusiasmo y aceptado por el grupo antes del min 7.",
+      parcial: "Se inició puntual pero la introducción se extendió hasta el minuto 10 antes del primer bloque de código práctico.",
+      nocumple: "Retraso de más de 5 minutos al iniciar la sesión o no se comunicó la misión práctica de la clase."
+    },
     quickNoteTemplates: [
-      "Inicio puntual con 100% de asistencia. Meta presentada con entusiasmo y aceptada por el grupo.",
-      "Demora de 3 min por actualización de Zoom de un alumno. Se recuperó el ritmo antes del min 8.",
-      "Alumnos muy participativos al definir las reglas de oro y la misión del juego."
+      "Inicio a tiempo con 100% de asistencia verificada. Objetivo presentado con entusiasmo y aceptado por el grupo antes del min 7.",
+      "Se inició puntual pero la introducción se extendió hasta el minuto 10 antes del primer bloque de código práctico.",
+      "Retraso de más de 5 minutos al iniciar la sesión o no se comunicó la misión práctica de la clase."
     ]
   },
   {
-    id: "c-interaccion-7030",
+    id: "c-norm-explicacion",
+    category: "Pedagogía y Contenido",
+    title: "Explicación estructurada",
+    description: "Desglose de conceptos complejos en micro-pasos comprensibles con analogías cercanas y modelado docente previo a la práctica.",
+    sessionTypes: ["normal"],
+    questions: [
+      "¿Dividiste los conceptos complejos en pasos pequeños y fácilmente digeribles para la edad del grupo?",
+      "¿Utilizaste analogías del mundo real o de videojuegos conocidos para explicar la lógica del código?",
+      "¿Evitaste tecnicismos innecesarios adaptando el vocabulario a nivel escolar?",
+      "¿Modelaste primero el ejemplo en tu pantalla antes de pedir a los alumnos que lo replicaran?",
+      "¿Mantuviste la explicación teórica en menos de 3 minutos consecutivos antes de pasar a la acción?"
+    ],
+    keywords: [
+      "EXPLICACION_ESTRUCTURADA",
+      "PASO_A_PASO",
+      "ANALOGIAS_LUDICAS",
+      "MODELADO_DOCENTE",
+      "MICRO_LECCIONES"
+    ],
+    tipICS: "Las explicaciones atomizadas (< 3 min) evitan la saturación cognitiva y mantienen el índice de atención activa, elemento nuclear medido por auditorías QA en el puntaje ICS.",
+    templates: {
+      cumple: "Explicación clara en micro-bloques con analogías cercanas. Los alumnos asimilaron la lógica sin confusiones conceptuales.",
+      parcial: "Explicación algo extensa (> 5 min) que requirió volver a explicar la lógica de los bloques durante la práctica.",
+      nocumple: "Monólogo teórico largo o uso de lenguaje abstracto que generó confusión generalizada en el alumnado."
+    },
+    quickNoteTemplates: [
+      "Explicación clara en micro-bloques con analogías cercanas. Los alumnos asimilaron la lógica sin confusiones conceptuales.",
+      "Explicación algo extensa (> 5 min) que requirió volver a explicar la lógica de los bloques durante la práctica.",
+      "Monólogo teórico largo o uso de lenguaje abstracto que generó confusión generalizada en el alumnado."
+    ]
+  },
+  {
+    id: "c-norm-participacion",
     category: "Participación y Engagement",
-    title: "Interacción continua y regla 70/30",
-    description: "Los alumnos programan y conversan el 70% del tiempo. El tutor guía con preguntas socráticas, evitando monólogos teóricos de más de 3 minutos.",
-    sessionTypes: ["normal", "graduation", "codegame"],
+    title: "Participación activa (micrófono, chat o reacciones)",
+    description: "Cumplimiento estricto de la regla 70/30: los estudiantes programan y se expresan la mayor parte del tiempo por múltiples canales.",
+    sessionTypes: ["normal"],
     questions: [
-      "¿Mencionaste el nombre de cada alumno al menos 3 veces durante la sesión?",
-      "¿Hiciste preguntas dirigidas y abiertas en lugar de preguntas genéricas al aire?",
-      "¿Involucraste a los niños más tímidos dándoles opciones simples de respuesta?",
-      "¿Rotaste el protagonismo para que ningún alumno acaparara toda la participación?",
-      "¿Permitiste que los estudiantes explicaran con sus palabras por qué eligieron un comando?"
+      "¿Cumpliste con la regla 70/30 donde los alumnos producen y hablan el 70% del tiempo de clase?",
+      "¿Alternaste canales de participación activa (micrófono abierto, chat de texto y reacciones con emojis)?",
+      "¿Llamaste por su nombre a los alumnos con baja participación para integrarlos amablemente sin presionar?",
+      "¿Planteaste preguntas con opciones (A/B o verdadero/falso) para facilitar la respuesta inmediata?",
+      "¿Garantizaste que todos los estudiantes tuvieran al menos 3 intervenciones significativas en la sesión?"
     ],
     keywords: [
-      "¿Quién me ayuda?",
-      "Pregunta detective",
-      "Micrófono de oro",
-      "Turno sorpresa",
-      "Tu turno de brillar",
-      "Explicación relámpago"
+      "PARTICIPACION_ACTIVA",
+      "REGLA_70_30",
+      "PARTICIPACION_CHAT",
+      "ROTACION_VOCAL",
+      "REACCIONES_EMOJI"
     ],
+    tipICS: "La interacción bidireccional continua pondera más del 30% del score de auditoría ICS; cuando un alumno participa activamente cada 5 minutos, la probabilidad de deserción cae un 80%.",
+    templates: {
+      cumple: "Excelente dinamismo: todos los alumnos respondieron por voz o chat y el 75% del tiempo fue manipulado por ellos.",
+      parcial: "Participación concentrada en 2 alumnos líderes; los alumnos más callados solo intervinieron tras insistencia.",
+      nocumple: "Clase unidireccional tipo conferencia; los alumnos permanecieron en silencio y con escasa intervención en chat."
+    },
     quickNoteTemplates: [
-      "Excelente dinámica de preguntas y respuestas; los alumnos guiaron la solución del código.",
-      "Se necesitó incentivar más a los alumnos tímidos mediante el chat interactivo.",
-      "Regla 70/30 cumplida con éxito, tutor intervino solo como guía facilitador."
+      "Excelente dinamismo: todos los alumnos respondieron por voz o chat y el 75% del tiempo fue manipulado por ellos.",
+      "Participación concentrada en 2 alumnos líderes; los alumnos más callados solo intervinieron tras insistencia.",
+      "Clase unidireccional tipo conferencia; los alumnos permanecieron en silencio y con escasa intervención en chat."
     ]
   },
   {
-    id: "c-monitoreo-pantallas",
+    id: "c-norm-acompanamiento",
     category: "Soporte Técnico y QA",
-    title: "Monitoreo constante de pantallas y prevención de frustración",
-    description: "Inspección continua del progreso individual para detectar bloqueos o errores de sintaxis en menos de 90 segundos.",
-    sessionTypes: ["normal", "graduation", "codegame"],
+    title: "Acompañamiento y resolución de dudas",
+    description: "Detección temprana de errores en pantallas compartidas y resolución socrática de bloqueos en menos de 90 segundos.",
+    sessionTypes: ["normal"],
     questions: [
-      "¿Solicitaste a los alumnos compartir pantalla o revisaste sus proyectos en la nube en tiempo real?",
-      "¿Detectaste bloqueos técnicos o errores antes de que el estudiante se desmotivara?",
-      "¿Enseñaste al alumno a encontrar su propio error sin quitarle el control del mouse?",
-      "¿Mantuviste al resto del grupo con un micro-reto mientras ayudabas a un alumno puntual?",
-      "¿Normalizaste el error celebrando los 'bugs' como oportunidades de ser detectives?"
+      "¿Detectaste bloqueos o errores de código en menos de 90 segundos mediante pantallas compartidas?",
+      "¿Guiaste con preguntas socráticas en lugar de dar la solución directa o tomar el control del mouse?",
+      "¿Asignaste micro-retos a los alumnos avanzados mientras ayudabas a quien se atrasó?",
+      "¿Validaste la emoción del alumno ante la frustración recordándole que 'el bug es un maestro'?",
+      "¿Te aseguraste de que el alumno verificara por sí mismo que su código funcionó tras la corrección?"
     ],
     keywords: [
-      "Comparte pantalla",
-      "Buscamos el bug",
-      "Equipo de rescate",
-      "Pausa estratégica",
-      "Misión detective",
-      "¡Encontraste el truco!"
+      "ACOMPANAMIENTO_EN_VIVO",
+      "RESOLUCION_DUDAS",
+      "METODO_SOCRATICO",
+      "MANEJO_FRUSTRACION",
+      "DETECCION_BUGS"
     ],
+    tipICS: "Resolver dudas en < 90s sin asumir el control directo fortalece la autoeficacia del estudiante, blindando la métrica de satisfacción reportada por los padres en el NPS e ICS.",
+    templates: {
+      cumple: "Dudas resueltas rápidamente guiando con pistas. Los alumnos encontraron sus errores y continuaron entusiasmados.",
+      parcial: "Se resolvió la duda pero tomó más de 4 minutos, provocando que otros alumnos esperaran sin tarea alterna.",
+      nocumple: "Dudas desatendidas o el tutor escribió el código por el alumno sin explicar la causa del fallo."
+    },
     quickNoteTemplates: [
-      "Monitoreo fluido; se resolvió un bloqueo de coordenadas en Scratch en menos de 1 minuto.",
-      "Un alumno tuvo pantalla negra momentánea, se aplicó recarga y continuó sin retrasos.",
-      "Se asignó mini-reto de personalización a los avanzados mientras se nivelaba a un alumno."
+      "Dudas resueltas rápidamente guiando con pistas. Los alumnos encontraron sus errores y continuaron entusiasmados.",
+      "Se resolvió la duda pero tomó más de 4 minutos, provocando que otros alumnos esperaran sin tarea alterna.",
+      "Dudas desatendidas o el tutor escribió el código por el alumno sin explicar la causa del fallo."
     ]
   },
   {
-    id: "c-gamificacion-energia",
-    category: "Pedagogía y Motivación",
-    title: "Gamificación, energía y refuerzo positivo",
-    description: "Uso activo de metáforas lúdicas, recompensas simbólicas (estrellas, puntos Kodland) y celebración genuina de cada logro individual.",
-    sessionTypes: ["normal", "codegame"],
+    id: "c-norm-recursos",
+    category: "Herramientas y Recursos",
+    title: "Uso de recursos adecuados",
+    description: "Preparación anticipada de enlaces, proyectos base, diapositivas oficiales Kodland y plan de contingencia técnico.",
+    sessionTypes: ["normal"],
     questions: [
-      "¿Mantuviste un tono de voz alegre, enérgico y modulado a lo largo de toda la clase?",
-      "¿Celebraste cada avance con stickers visuales, aplausos virtuales o puntos de misión?",
-      "¿Transformaste conceptos complejos de programación en analogías de videojuegos o vida real?",
-      "¿Fomentaste el compañerismo y felicitaciones mutuas entre los niños?"
+      "¿Tuviste listas y abiertas las pestañas, plataformas, enlaces y proyectos base antes de iniciar la sesión?",
+      "¿Compartiste recursos por el chat de la llamada de forma limpia y accesible para todos los alumnos?",
+      "¿Utilizaste material visual de apoyo (diapositivas oficiales Kodland, esquemas o pizarra virtual)?",
+      "¿Verificaste que los enlaces compartidos tuvieran permisos públicos o de acceso correctos?",
+      "¿Contabas con un proyecto de respaldo o plan B listo ante lentitud o caídas de la plataforma principal?"
     ],
     keywords: [
-      "¡Nivel superado!",
-      "Bono de creatividad",
-      "Estrellas Kodland",
-      "Superpoder desbloqueado",
-      "Puntos de misión",
-      "Aplauso virtual"
+      "RECURSOS_DIDACTICOS",
+      "ENLACES_VERIFICADOS",
+      "MATERIAL_KODLAND",
+      "PIZARRA_VIRTUAL",
+      "PLAN_B_TECNICO"
     ],
+    tipICS: "La fluidez en el manejo de recursos previene tiempos muertos, factor que los auditores QA castigan de inmediato por su correlación directa con la distracción y desconexión infantil.",
+    templates: {
+      cumple: "Plataformas y enlaces funcionaron impecables; uso acertado de recursos visuales y pizarra virtual Kodland.",
+      parcial: "Un recurso no abrió inmediatamente o faltaron permisos, requiriendo 2 minutos para corregir el acceso.",
+      nocumple: "Pérdida de tiempo prolongada buscando materiales durante la clase o falta de preparación previa."
+    },
     quickNoteTemplates: [
-      "Alta energía durante los 60 minutos. Los niños compitieron de forma sana por estrellas.",
-      "Se utilizaron metáforas de Minecraft/Roblox que conectaron inmediatamente con los conceptos."
+      "Plataformas y enlaces funcionaron impecables; uso acertado de recursos visuales y pizarra virtual Kodland.",
+      "Un recurso no abrió inmediatamente o faltaron permisos, requiriendo 2 minutos para corregir el acceso.",
+      "Pérdida de tiempo prolongada buscando materiales durante la clase o falta de preparación previa."
     ]
   },
   {
-    id: "c-cierre-cliffhanger",
+    id: "c-norm-tiempo",
+    category: "Gestión de Aula",
+    title: "Gestión del tiempo y ritmo",
+    description: "Distribución equilibrada del cronómetro en fases pedagógicas sin apresuramientos finales ni tiempos muertos.",
+    sessionTypes: ["normal"],
+    questions: [
+      "¿Cronometraste las fases de la clase respetando los tiempos asignados a teoría, práctica y cierre?",
+      "¿Ajustaste la velocidad de la sesión según el nivel real de asimilación del grupo de estudiantes?",
+      "¿Evitaste desviaciones prolongadas de tema manteniendo el hilo conductor de la clase?",
+      "¿Iniciaste la fase de consolidación y pruebas de proyectos a tiempo (minuto 45-50)?",
+      "¿Finalizaste la sesión exactamente a la hora convenida sin recortar los minutos de cierre?"
+    ],
+    keywords: [
+      "GESTION_TIEMPO",
+      "RITMO_PEDAGOGICO",
+      "CONTROL_CRONOMETRO",
+      "FASES_DE_CLASE",
+      "PUNTUALIDAD_SALIDA"
+    ],
+    tipICS: "Un ritmo equilibrado evita la prisa angustiante al final; los padres valoran la puntualidad y el algoritmo ICS premia la consistencia cronológica en cada fase de la lección.",
+    templates: {
+      cumple: "Control impecable del cronómetro: todas las etapas pedagógicas se cubrieron sin prisas ni tiempos muertos.",
+      parcial: "La fase práctica se alargó de más, dejando menos de 3 minutos para las pruebas finales.",
+      nocumple: "La clase se desbordó en tiempo o se terminó apresuradamente sin completar el objetivo básico programado."
+    },
+    quickNoteTemplates: [
+      "Control impecable del cronómetro: todas las etapas pedagógicas se cubrieron sin prisas ni tiempos muertos.",
+      "La fase práctica se alargó de más, dejando menos de 3 minutos para las pruebas finales.",
+      "La clase se desbordó en tiempo o se terminó apresuradamente sin completar el objetivo básico programado."
+    ]
+  },
+  {
+    id: "c-norm-comprension",
+    category: "Evaluación Formativa",
+    title: "Verificación frecuente de comprensión",
+    description: "Chequeos formativos interactivos cada 7-10 minutos para validar que ningún alumno quede rezagado en silencio.",
+    sessionTypes: ["normal"],
+    questions: [
+      "¿Realizaste chequeos rápidos de comprensión cada 7 a 10 minutos (ej. 'Pulgar arriba', '1 en el chat')?",
+      "¿Pediste a un alumno parafrasear con sus palabras qué hace el comando o bucle recién implementado?",
+      "¿Verificaste activamente que todos estuvieran en la misma línea de código o bloque antes de avanzar?",
+      "¿Planteaste pequeños acertijos '¿Qué pasaría si...?' para comprobar el pensamiento lógico?",
+      "¿Evitaste asumir que todos entendieron con un simple '¿todo claro?' general al aire?"
+    ],
+    keywords: [
+      "VERIFICACION_COMPRENSION",
+      "CHEQUEO_FORMATIVO",
+      "PENSAMIENTO_LOGICO",
+      "PULGAR_ARRIBA",
+      "PARAFRASEO_ALUMNO"
+    ],
+    tipICS: "Comprobar la comprensión de manera interactiva garantiza que ningún estudiante quede rezagado en silencio, manteniendo el índice de persistencia del alumno en verde en la plataforma.",
+    templates: {
+      cumple: "Comprobaciones continuas y dinámicas en cada paso. Todos demostraron comprender el porqué de cada bloque.",
+      parcial: "Se avanzó asumiendo comprensión con pocos pulgares arriba sin verificar a los alumnos más lentos.",
+      nocumple: "Cero verificación de conceptos; se avanzó sin comprobar si los niños entendían o sólo copiaban código."
+    },
+    quickNoteTemplates: [
+      "Comprobaciones continuas y dinámicas en cada paso. Todos demostraron comprender el porqué de cada bloque.",
+      "Se avanzó asumiendo comprensión con pocos pulgares arriba sin verificar a los alumnos más lentos.",
+      "Cero verificación de conceptos; se avanzó sin comprobar si los niños entendían o sólo copiaban código."
+    ]
+  },
+  {
+    id: "c-norm-feedback",
+    category: "Motivación y Clima Emocional",
+    title: "Feedback constructivo y refuerzo positivo",
+    description: "Reconocimiento genuino del esfuerzo y la creatividad con recompensas gamificadas y normalización del error.",
+    sessionTypes: ["normal"],
+    questions: [
+      "¿Elogiaste el esfuerzo y la estrategia del alumno en lugar de solo felicitar el resultado final?",
+      "¿Destacaste ideas creativas o soluciones alternativas propuestas por los estudiantes?",
+      "¿Corregiste errores de forma sutil, positiva y privada cuando fue necesario?",
+      "¿Otorgaste reconocimientos gamificados (estrellas Kodland, medallas de bug-hunter, aplausos virtuales)?",
+      "¿Mantuviste un clima seguro donde equivocarse fue recibido con naturalidad y buen humor?"
+    ],
+    keywords: [
+      "FEEDBACK_CONSTRUCTIVO",
+      "REFUERZO_POSITIVO",
+      "ESTRELLAS_KODLAND",
+      "CULTURA_DEL_ERROR",
+      "MOTIVACION_INFANTIL"
+    ],
+    tipICS: "El refuerzo positivo verbal activa la dopamina y la memoria asociativa de éxito; es el indicador con mayor correlación con la renovación de membresías en Kodland.",
+    templates: {
+      cumple: "Ambiente cálido y motivador con felicitaciones específicas por esfuerzo y creatividad. Niños felices y empoderados.",
+      parcial: "Se dio feedback correcto pero genérico ('bien', 'buen trabajo') sin resaltar el logro específico de cada niño.",
+      nocumple: "Comentarios secos, falta de calidez o corrección punitiva que desanimó la iniciativa de los estudiantes."
+    },
+    quickNoteTemplates: [
+      "Ambiente cálido y motivador con felicitaciones específicas por esfuerzo y creatividad. Niños felices y empoderados.",
+      "Se dio feedback correcto pero genérico ('bien', 'buen trabajo') sin resaltar el logro específico de cada niño.",
+      "Comentarios secos, falta de calidez o corrección punitiva que desanimó la iniciativa de los estudiantes."
+    ]
+  },
+  {
+    id: "c-norm-cierre",
     category: "Retención y Cierre",
-    title: "Cierre estructurado, resumen interactivo y Cliffhanger",
-    description: "Finalización con resumen hecho por los propios niños, guardado seguro de proyectos y revelación intrigante de la próxima clase.",
-    sessionTypes: ["normal", "codegame"],
+    title: "Cierre atractivo y cuidado de los últimos 5 minutos",
+    description: "Finalización con resumen de los niños, guardado verificado de proyectos y gancho de intriga (Cliffhanger) para la próxima sesión.",
+    sessionTypes: ["normal"],
     questions: [
-      "¿Iniciaste el proceso de cierre y guardado al menos 7 minutos antes del final?",
-      "¿Cada alumno confirmó haber guardado su proyecto o enviado el link de avance?",
-      "¿Preguntaste qué fue lo que más les gustó o qué nuevo concepto dominaron hoy?",
-      "¿Lanzaste un gancho de intriga (Cliffhanger) para generar expectativa por la siguiente sesión?",
-      "¿Te despediste con afecto recordando el día y la hora del próximo encuentro?"
+      "¿Detuviste la escritura de código nuevo a partir del minuto 53 para iniciar el ritual de cierre?",
+      "¿Aseguraste que cada alumno guardara su archivo/proyecto en la plataforma o nube?",
+      "¿Pediste a los alumnos compartir qué fue lo que más disfrutaron crear en la jornada?",
+      "¿Lanzaste un cliffhanger o avance emocionante de lo que construirán en la siguiente clase?",
+      "¿Te despediste con entusiasmo recordando con precisión el día y la hora del próximo encuentro?"
     ],
     keywords: [
-      "¿Qué aprendimos hoy?",
-      "Guardado seguro",
-      "Spoiler del próximo nivel",
-      "Misterio de la semana",
-      "¡Hasta la próxima misión!",
-      "Desafío extra"
+      "CIERRE_ATRACTIVO",
+      "ULTIMOS_5_MIN",
+      "CLIFFHANGER_FINAL",
+      "GUARDADO_SEGURO",
+      "PROXIMA_MISION"
     ],
+    tipICS: "Los últimos 5 minutos determinan la 'memoria pico-final' de la experiencia; un cliffhanger bien ejecutado eleva la asistencia de la siguiente semana por encima del 96%.",
+    templates: {
+      cumple: "Cierre redondo: proyectos guardados, mini-resumen de los niños, cliffhanger emocionante y despedida enérgica.",
+      parcial: "Se guardó el proyecto pero se cortó abruptamente la llamada sin resumen ni expectativa para la próxima clase.",
+      nocumple: "La clase terminó tarde, sin guardar proyectos o con despedida apresurada y desordenada."
+    },
     quickNoteTemplates: [
-      "Cierre a tiempo. Los alumnos resumieron el uso de bucles y quedaron ansiosos por el jefe final.",
-      "Se aseguró el guardado de todos los proyectos en la plataforma Kodland."
+      "Cierre redondo: proyectos guardados, mini-resumen de los niños, cliffhanger emocionante y despedida enérgica.",
+      "Se guardó el proyecto pero se cortó abruptamente la llamada sin resumen ni expectativa para la próxima clase.",
+      "La clase terminó tarde, sin guardar proyectos o con despedida apresurada y desordenada."
     ]
   },
   {
-    id: "c-graduacion-proyectos",
-    category: "Graduación y Padres",
-    title: "Showcase de proyectos y conexión con familias",
-    description: "Presentación protocolar de proyectos finales ante padres de familia, destacando el crecimiento técnico y las habilidades blandas del alumno.",
+    id: "c-norm-evidencias",
+    category: "Gestión Administrativa y QA",
+    title: "Evidencias, asistencia y reporte técnico",
+    description: "Registro puntual de asistencia, capturas de proyectos en plataforma y reporte individualizado para feedback a familias.",
+    sessionTypes: ["normal"],
+    questions: [
+      "¿Registraste la asistencia oficial y puntualidad de cada alumno en el portal de Kodland?",
+      "¿Capturaste evidencias visuales (pantallazos de proyectos o grabaciones) según el protocolo?",
+      "¿Documentaste incidencias técnicas o de comportamiento para seguimiento del Team Lead?",
+      "¿Redactaste comentarios individuales claros sobre el avance del alumno para los reportes a familias?",
+      "¿Cerraste las salas de breakout y la videollamada de forma ordenada y segura?"
+    ],
+    keywords: [
+      "REPORTE_TECNICO",
+      "REGISTRO_ASISTENCIA",
+      "EVIDENCIAS_PROYECTO",
+      "FEEDBACK_FAMILIAS",
+      "PROTOCOLO_KODLAND"
+    ],
+    tipICS: "El registro impecable de asistencia y comentarios objetivos nutre los reportes automáticos que reciben los padres; QA audita este rubro para validar la consistencia total del ICS.",
+    templates: {
+      cumple: "Asistencia y reporte completados a tiempo con comentarios detallados y capturas del avance de cada alumno.",
+      parcial: "Asistencia registrada pero notas de avance breves o incompletas sin detalles específicos del progreso.",
+      nocumple: "Falta de reporte en el sistema o registro extemporáneo después de las 24 horas reglamentarias."
+    },
+    quickNoteTemplates: [
+      "Asistencia y reporte completados a tiempo con comentarios detallados y capturas del avance de cada alumno.",
+      "Asistencia registrada pero notas de avance breves o incompletas sin detalles específicos del progreso.",
+      "Falta de reporte en el sistema o registro extemporáneo después de las 24 horas reglamentarias."
+    ]
+  },
+
+  // ---------------------------------------------------------------------------
+  // B. GRADUACIÓN (10 Criterios)
+  // ---------------------------------------------------------------------------
+  {
+    id: "c-grad-bienvenida",
+    category: "Apertura y Protocolo",
+    title: "Bienvenida protocolar y conexión con familias",
+    description: "Inicio formal y emotivo agradeciendo la presencia de padres y estableciendo el tono de celebración para los graduados.",
     sessionTypes: ["graduation"],
     questions: [
-      "¿Diste una bienvenida formal y cálida a las familias presentes en la videollamada?",
-      "¿Cada alumno presentó su proyecto explicando lógica, diseño y dificultades superadas?",
-      "¿Diste un feedback personalizado y motivador destacando el talento único de cada niño?",
-      "¿Invitaste a los padres a compartir palabras de orgullo y felicitaciones a sus hijos?",
-      "¿Mostraste la ruta de aprendizaje siguiente y el certificado oficial de Kodland?"
+      "¿Iniciaste puntual dando la bienvenida con calidez a los alumnos y a los padres de familia presentes?",
+      "¿Agradeciste a las familias por su confianza y acompañamiento durante todo el trayecto formativo?",
+      "¿Verificaste que todos los invitados tuvieran audio y video listos para disfrutar de la ceremonia?",
+      "¿Presentaste el propósito de la sesión: celebrar los logros y la creatividad de los graduados?",
+      "¿Generaste un ambiente festivo y solemne a la vez, destacando el esfuerzo de los niños?"
     ],
     keywords: [
-      "Bienvenidos padres y familias",
-      "Creadores del futuro",
-      "Demostración en vivo",
-      "Certificado oficial Kodland",
-      "Orgullo y crecimiento",
-      "Próximo nivel formativo"
+      "BIENVENIDA_FAMILIAS",
+      "PROTOCOLO_GRADUACION",
+      "CONEXION_EMOCIONAL",
+      "AGRADECIMIENTO_PADRES",
+      "APERTURA_FESTIVA"
     ],
+    tipICS: "La presencia y bienvenida a las familias en la graduación consolida la fidelización institucional; el NPS post-graduación impacta de forma directa la renovación en el siguiente ciclo.",
+    templates: {
+      cumple: "Bienvenida cordial y emotiva con asistencia familiar activa. Ambiente de fiesta y orgullo compartido desde el min 1.",
+      parcial: "Bienvenida formal pero con poca interacción con los padres presentes en la sala virtual.",
+      nocumple: "No se reconoció a las familias presentes o se inició la sesión como si fuera una clase común."
+    },
     quickNoteTemplates: [
-      "Graduación emocionante. Los 4 padres asistieron y quedaron asombrados con los juegos creados.",
-      "Excelente desenvolvimiento de los alumnos al defender su proyecto y explicar su código."
+      "Bienvenida cordial y emotiva con asistencia familiar activa. Ambiente de fiesta y orgullo compartido desde el min 1.",
+      "Bienvenida formal pero con poca interacción con los padres presentes en la sala virtual.",
+      "No se reconoció a las familias presentes o se inició la sesión como si fuera una clase común."
     ]
   },
   {
-    id: "c-codegame-dinamica",
-    category: "Dinámica Especial",
-    title: "Retos de velocidad, acertijos y ranking cooperativo",
-    description: "Estructura ágil de retos de código gamificados en formato batalla amistosa o escape room digital para maximizar el factor diversión.",
-    sessionTypes: ["codegame"],
+    id: "c-grad-encuadre",
+    category: "Estructura y Organización",
+    title: "Presentación de la agenda y reglas de graduación",
+    description: "Estructuración del orden del día, tiempos de exhibición individual y reglas de aplausos y respeto mutuo.",
+    sessionTypes: ["graduation"],
     questions: [
-      "¿Explicaste la mecánica del juego o reto de manera clara y en menos de 2 minutos?",
-      "¿Garantizaste que el reto fuera accesible para todos los niveles de habilidad?",
-      "¿Mantuviste una narración dinámica como caster/árbitro divertido durante las pruebas?",
-      "¿Enfocaste el puntaje en el esfuerzo y la creatividad más que en la simple velocidad?"
+      "¿Presentaste el orden del día y el tiempo estimado para cada presentación de proyecto?",
+      "¿Explicaste cómo funcionará la ronda de preguntas, felicitaciones y la entrega de diplomas?",
+      "¿Fomentaste el respeto y la escucha activa pidiendo aplausos virtuales para cada compañero?",
+      "¿Comprobaste el orden de los expositores asegurándote de que todos conocieran su turno?",
+      "¿Infundiste tranquilidad a los alumnos recordándoles que es un espacio de celebración, no un examen?"
     ],
     keywords: [
-      "¡3, 2, 1, a programar!",
-      "Acertijo desbloqueado",
-      "Puntos de equipo",
-      "Ronda relámpago",
-      "Victoria compartida"
+      "AGENDA_GRADUACION",
+      "ORDEN_EXPOSITORES",
+      "REGLAS_DE_CONVIVENCIA",
+      "CLIMA_DE_CONFIANZA",
+      "PROTOCOLO_SHOWCASE"
     ],
+    tipICS: "Una agenda transparente reduce la ansiedad escénica del niño y garantiza que cada alumno cuente con el mismo tiempo de protagonismo en pantalla.",
+    templates: {
+      cumple: "Agenda y dinámicas explicadas con claridad. Alumnos y padres atentos, tranquilos y listos para aplaudir.",
+      parcial: "Se dio la agenda pero hubo dudas sobre los tiempos individuales de cada alumno.",
+      nocumple: "Falta de orden estructurado, provocando confusión en el orden de las presentaciones."
+    },
     quickNoteTemplates: [
-      "Sesión Code & Game muy divertida. Todos los alumnos completaron al menos 3 desafíos.",
-      "Gran trabajo en equipo y compañerismo en la resolución de los acertijos lógicos."
+      "Agenda y dinámicas explicadas con claridad. Alumnos y padres atentos, tranquilos y listos para aplaudir.",
+      "Se dio la agenda pero hubo dudas sobre los tiempos individuales de cada alumno.",
+      "Falta de orden estructurado, provocando confusión en el orden de las presentaciones."
+    ]
+  },
+  {
+    id: "c-grad-showcase",
+    category: "Showcase y Habilidades Técnicas",
+    title: "Exposición individual y defensa de proyectos",
+    description: "Cada alumno comparte pantalla, demuestra la lógica de su código y responde sobre su proceso creativo con autonomía.",
+    sessionTypes: ["graduation"],
+    questions: [
+      "¿Cada estudiante compartió pantalla y presentó su proyecto final de manera autónoma?",
+      "¿El alumno explicó el funcionamiento general, la mecánica de juego y el código detrás de su creación?",
+      "¿Le diste pie al alumno para hablar sobre el desafío más complejo que logró resolver?",
+      "¿Facilitaste la presentación interviniendo solo como anfitrión sin robarle la palabra?",
+      "¿Se respetó el tiempo asignado para que ningún proyecto quedara sin exhibición completa?"
+    ],
+    keywords: [
+      "DEFENSA_PROYECTO",
+      "AUTONOMIA_ALUMNO",
+      "LOGICA_DE_CODIGO",
+      "EXPOSICION_ORAL",
+      "PROTAGONISMO_INFANTIL"
+    ],
+    tipICS: "Ver a su hijo defender código con solvencia es el mayor detonador de valor percibido por las familias; eleva la tasa de retención por encima del 92%.",
+    templates: {
+      cumple: "Cada alumno expuso con fluidez su código y proyecto. Demostraron dominio técnico y orgullo por su trabajo.",
+      parcial: "El alumno presentó el juego pero no profundizó en la explicación de la lógica o dependió mucho del tutor.",
+      nocumple: "Presentaciones apresuradas, desordenadas o el tutor explicó el proyecto en lugar del estudiante."
+    },
+    quickNoteTemplates: [
+      "Cada alumno expuso con fluidez su código y proyecto. Demostraron dominio técnico y orgullo por su trabajo.",
+      "El alumno presentó el juego pero no profundizó en la explicación de la lógica o dependió mucho del tutor.",
+      "Presentaciones apresuradas, desordenadas o el tutor explicó el proyecto en lugar del estudiante."
+    ]
+  },
+  {
+    id: "c-grad-preguntas-padres",
+    category: "Interacción con Padres",
+    title: "Participación y preguntas abiertas a familias",
+    description: "Espacio de diálogo abierto donde los padres felicitan a sus hijos y comparten su testimonio sobre el avance visto en casa.",
+    sessionTypes: ["graduation"],
+    questions: [
+      "¿Invitaste activamente a los padres o tutores a comentar sobre el proyecto presentado por su hijo?",
+      "¿Formulaste preguntas cálidas a las familias sobre los cambios que han visto en el niño durante el curso?",
+      "¿Permitiste que otros compañeros del grupo hicieran preguntas constructivas al expositor?",
+      "¿Agradeciste cada intervención familiar reforzando el impacto del apoyo en el hogar?",
+      "¿Mantuviste un ritmo fluido evitando que una sola familia monopolizara el tiempo de preguntas?"
+    ],
+    keywords: [
+      "FEEDBACK_PADRES",
+      "PREGUNTAS_FAMILIARES",
+      "INTERACCION_COMUNIDAD",
+      "VALOR_PERCIBIDO",
+      "DIALOGO_POSITIVO"
+    ],
+    tipICS: "Involucrar activamente la voz de los padres durante la graduación multiplica el apego emocional a Kodland y previene cancelaciones sorpresivas.",
+    templates: {
+      cumple: "Participación familiar emotiva y espontánea. Los padres expresaron orgullo y agradecieron el trabajo docente.",
+      parcial: "Solo un padre participó o las preguntas fueron muy cerradas sin generar conversación nutritiva.",
+      nocumple: "No se dio espacio de palabra a las familias o se ignoraron las muestras de interacción en el chat."
+    },
+    quickNoteTemplates: [
+      "Participación familiar emotiva y espontánea. Los padres expresaron orgullo y agradecieron el trabajo docente.",
+      "Solo un padre participó o las preguntas fueron muy cerradas sin generar conversación nutritiva.",
+      "No se dio espacio de palabra a las familias o se ignoraron las muestras de interacción en el chat."
+    ]
+  },
+  {
+    id: "c-grad-evaluacion-habilidades",
+    category: "Evaluación Pedagógica Integral",
+    title: "Reconocimiento de competencias blandas y lógicas",
+    description: "Explicitación docente del desarrollo de pensamiento computacional, resiliencia, creatividad y trabajo autónomo.",
+    sessionTypes: ["graduation"],
+    questions: [
+      "¿Mencionaste habilidades blandas específicas desarrolladas por el alumno (resiliencia, paciencia, creatividad)?",
+      "¿Destacaste el razonamiento computacional alcanzado (bucles, eventos, condicionales, variables)?",
+      "¿Señalaste cómo el alumno superó momentos de dificultad técnica a lo largo de las clases?",
+      "¿Reconociste el estilo propio y la originalidad visual o narrativa de cada proyecto?",
+      "¿Conectaste esas habilidades con aplicaciones para su vida académica y futura?"
+    ],
+    keywords: [
+      "HABILIDADES_BLANDAS",
+      "PENSAMIENTO_COMPUTACIONAL",
+      "RESILIENCIA_TECNICA",
+      "CREATIVIDAD_DIGITAL",
+      "EVALUACION_INTEGRAL"
+    ],
+    tipICS: "Explicitar las competencias blandas adquiridas demuestra a los padres que Kodland no solo enseña código, sino mentalidad de crecimiento, pilar del ICS institucional.",
+    templates: {
+      cumple: "Menciones personalizadas impecables: se destacó la resiliencia y el pensamiento analítico de cada graduado.",
+      parcial: "Comentarios centrados únicamente en lo visual sin reconocer la evolución del pensamiento lógico.",
+      nocumple: "Reconocimientos impersonales idénticos para todos sin individualizar el esfuerzo real del alumno."
+    },
+    quickNoteTemplates: [
+      "Menciones personalizadas impecables: se destacó la resiliencia y el pensamiento analítico de cada graduado.",
+      "Comentarios centrados únicamente en lo visual sin reconocer la evolución del pensamiento lógico.",
+      "Reconocimientos impersonales idénticos para todos sin individualizar el esfuerzo real del alumno."
+    ]
+  },
+  {
+    id: "c-grad-feedback-alumno",
+    category: "Experiencia del Alumno",
+    title: "Feedback individualizado y momentos 'Wow'",
+    description: "Elogio nominal emotivo con anécdotas de crecimiento personal que marcan un hito memorable para el estudiante.",
+    sessionTypes: ["graduation"],
+    questions: [
+      "¿Dedicaste al menos 60 segundos exclusivos para felicitar nominalmente a cada graduado?",
+      "¿Resaltaste una anécdota o hito memorable que el alumno logró durante el ciclo?",
+      "¿Incentivaste que el grupo celebrara con reacciones de aplausos, música o confeti virtual?",
+      "¿Lograste que el alumno se sintiera visiblemente orgulloso y motivado por lo que creó?",
+      "¿Utilizaste un tono de voz celebratorio, afectuoso y memorable?"
+    ],
+    keywords: [
+      "MOMENTO_WOW",
+      "ELOGIO_NOMINAL",
+      "CELEBRACION_VIRTUAL",
+      "AUTOESTIMA_CREADORA",
+      "MEMORIA_EMOCIONAL"
+    ],
+    tipICS: "El 'momento Wow' fija el ancla emocional más potente del ciclo; un estudiante conmovido y orgulloso pide continuar en el siguiente nivel sin dudar.",
+    templates: {
+      cumple: "Momento Wow para cada niño con anécdotas reales y festejo colectivo inolvidable.",
+      parcial: "Feedback positivo pero algo apresurado por presión de tiempo en los últimos expositores.",
+      nocumple: "Falta de entusiasmo o trato indiferente que no diferenció la graduación de un día regular."
+    },
+    quickNoteTemplates: [
+      "Momento Wow para cada niño con anécdotas reales y festejo colectivo inolvidable.",
+      "Feedback positivo pero algo apresurado por presión de tiempo en los últimos expositores.",
+      "Falta de entusiasmo o trato indiferente que no diferenció la graduación de un día regular."
+    ]
+  },
+  {
+    id: "c-grad-diplomas",
+    category: "Certificación y Reconocimiento",
+    title: "Entrega solemne de diplomas y certificados Kodland",
+    description: "Presentación formal en pantalla de los diplomas oficiales con lectura solemne y tiempo para fotografías familiares.",
+    sessionTypes: ["graduation"],
+    questions: [
+      "¿Proyectaste el certificado oficial personalizado de cada estudiante en pantalla compartida?",
+      "¿Leíste el diploma con solemnidad destacando el curso y las competencias acreditadas?",
+      "¿Diste tiempo a las familias para tomar fotografías o capturas de pantalla del momento?",
+      "¿Explicaste cómo y cuándo recibirán el documento digital en sus correos o plataforma?",
+      "¿Pediste un aplauso grupal al completar la lectura de cada diploma?"
+    ],
+    keywords: [
+      "DIPLOMA_OFICIAL",
+      "CERTIFICACION_KODLAND",
+      "SOLEMNIDAD_DOCENTE",
+      "FOTO_DEL_DIPLOMA",
+      "RECONOCIMIENTO_FORMAL"
+    ],
+    tipICS: "La visualización solemne del diploma materializa el retorno de inversión para la familia, garantizando calificaciones máximas en las auditorías QA de graduaciones.",
+    templates: {
+      cumple: "Entrega protocolar hermosa de cada certificado con tiempo para fotos y ovación de los presentes.",
+      parcial: "Se mostraron los diplomas pero de forma veloz sin permitir que las familias hicieran capturas.",
+      nocumple: "No se proyectaron los diplomas oficiales o hubo errores en los nombres de los estudiantes."
+    },
+    quickNoteTemplates: [
+      "Entrega protocolar hermosa de cada certificado con tiempo para fotos y ovación de los presentes.",
+      "Se mostraron los diplomas pero de forma veloz sin permitir que las familias hicieran capturas.",
+      "No se proyectaron los diplomas oficiales o hubo errores en los nombres de los estudiantes."
+    ]
+  },
+  {
+    id: "c-grad-ruta-futuro",
+    category: "Continuidad y Roadmap",
+    title: "Presentación del siguiente nivel del itinerario formativo",
+    description: "Proyección clara del mapa de aprendizaje futuro, nuevos lenguajes/herramientas y motivación para continuar el trayecto.",
+    sessionTypes: ["graduation"],
+    questions: [
+      "¿Presentaste con entusiasmo las tecnologías y proyectos del siguiente módulo/curso Kodland?",
+      "¿Conectaste lo aprendido hoy con lo que serán capaces de crear en la siguiente etapa?",
+      "¿Mostraste ejemplos visuales atractivos o clips del nuevo nivel que despertaran curiosidad?",
+      "¿Explicaste a los padres de manera clara cómo continuar la formación de su hijo?",
+      "¿Resolviste dudas de las familias sobre horarios o modalidades del nuevo ciclo formativo?"
+    ],
+    keywords: [
+      "ITINERARIO_FORMATIVO",
+      "SIGUIENTE_NIVEL",
+      "CONTINUIDAD_EDUCATIVA",
+      "ROADMAP_KODLAND",
+      "RETENCION_CICLO"
+    ],
+    tipICS: "Presentar el roadmap formativo con claridad eleva la tasa de reinscripción por encima del 85%; es la métrica de negocio más vigilada en conjunto con el ICS.",
+    templates: {
+      cumple: "Roadmap del siguiente nivel presentado con clips increíbles. Alumnos y padres entusiasmados por empezar el próximo curso.",
+      parcial: "Se mencionó el siguiente nivel pero sin material visual convincente que despertara el deseo de continuar.",
+      nocumple: "Omisión total de la ruta de continuidad formativa o información vaga sobre cómo seguir estudiando."
+    },
+    quickNoteTemplates: [
+      "Roadmap del siguiente nivel presentado con clips increíbles. Alumnos y padres entusiasmados por empezar el próximo curso.",
+      "Se mencionó el siguiente nivel pero sin material visual convincente que despertara el deseo de continuar.",
+      "Omisión total de la ruta de continuidad formativa o información vaga sobre cómo seguir estudiando."
+    ]
+  },
+  {
+    id: "c-grad-foto-cierre",
+    category: "Cierre y Comunidad",
+    title: "Foto grupal, aplausos y despedida memorable",
+    description: "Captura de recuerdo con cámaras encendidas, gestos temáticos, micrófono abierto y despedida conmovedora.",
+    sessionTypes: ["graduation"],
+    questions: [
+      "¿Invitaste a todos los alumnos y padres a encender sus cámaras para la fotografía oficial de graduación?",
+      "¿Coordinaste una pose divertida o gesto temático (ej. saludo de programadores, pulgares arriba)?",
+      "¿Capturaste múltiples fotografías asegurando que todos salieran bien iluminados y enfocados?",
+      "¿Despediste la sesión con palabras de inspiración y agradecimiento sincero?",
+      "¿Permitiste un minuto final de micrófonos abiertos para felicitaciones espontáneas entre todos?"
+    ],
+    keywords: [
+      "FOTO_GRUPAL",
+      "CAMARAS_ENCENDIDAS",
+      "DESPEDIDA_MEMORABLE",
+      "COMUNIDAD_KODLAND",
+      "APLAUSO_FINAL"
+    ],
+    tipICS: "La fotografía con cámaras encendidas y micrófonos abiertos crea sentido de pertenencia y comunidad, cerrando con la máxima puntuación en el factor humano del ICS.",
+    templates: {
+      cumple: "Cierre apoteósico: 100% de cámaras encendidas, foto grupal divertida y aplauso unánime de familias.",
+      parcial: "Se tomó la foto pero varias cámaras se quedaron apagadas sin mayor motivación del tutor.",
+      nocumple: "No se organizó fotografía grupal o la llamada se cerró de golpe tras la entrega de diplomas."
+    },
+    quickNoteTemplates: [
+      "Cierre apoteósico: 100% de cámaras encendidas, foto grupal divertida y aplauso unánime de familias.",
+      "Se tomó la foto pero varias cámaras se quedaron apagadas sin mayor motivación del tutor.",
+      "No se organizó fotografía grupal o la llamada se cerró de golpe tras la entrega de diplomas."
+    ]
+  },
+  {
+    id: "c-grad-reporte-final",
+    category: "Gestión Administrativa y QA",
+    title: "Reporte de graduación y entrega de evidencias a QA",
+    description: "Carga de fotos grupales, enlaces de proyectos finales, actualización del estado a 'Graduado' y reporte a asesores.",
+    sessionTypes: ["graduation"],
+    questions: [
+      "¿Subiste las fotos grupales y enlaces de proyectos al expediente de la clase en el portal de Kodland?",
+      "¿Marcaste el estado de 'Graduado' a cada alumno con su registro de asistencia final?",
+      "¿Enviaste las recomendaciones de continuidad personalizadas al equipo de retención/asesores?",
+      "¿Reportaste cualquier incidencia o feedback especial expresado por las familias en la sesión?",
+      "¿Completaste el formulario de cierre dentro del plazo reglamentario posterior a la ceremonia?"
+    ],
+    keywords: [
+      "REPORTE_GRADUACION",
+      "EXPEDIENTE_KODLAND",
+      "EVIDENCIAS_QA",
+      "SEGUIMIENTO_RETENCION",
+      "REGISTRO_ADMINISTRATIVO"
+    ],
+    tipICS: "La entrega de evidencias de graduación en las primeras 12 horas asegura el flujo de renovación de matrículas y protege la calificación del tutor en la nómina QA.",
+    templates: {
+      cumple: "Reporte y evidencias de graduación cargados de inmediato con fotos, enlaces y notas individuales.",
+      parcial: "Reporte enviado pero faltaron fotos de la sesión o notas sobre el interés de continuidad de los alumnos.",
+      nocumple: "Falta de reporte de graduación en plataforma o demora mayor a 24 horas que afectó la gestión de retención."
+    },
+    quickNoteTemplates: [
+      "Reporte y evidencias de graduación cargados de inmediato con fotos, enlaces y notas individuales.",
+      "Reporte enviado pero faltaron fotos de la sesión o notas sobre el interés de continuidad de los alumnos.",
+      "Falta de reporte de graduación en plataforma o demora mayor a 24 horas que afectó la gestión de retención."
+    ]
+  },
+
+  // ---------------------------------------------------------------------------
+  // C. CODE & GAME (10 Criterios)
+  // ---------------------------------------------------------------------------
+  {
+    id: "c-cg-onboarding",
+    category: "Onboarding y Gamificación",
+    title: "Inicio electrizante y reglas de la arena de juego",
+    description: "Arranque dinámico con música/ambientación temática gamer, verificación rápida de accesos y reglas de juego limpio.",
+    sessionTypes: ["codegame"],
+    questions: [
+      "¿Iniciaste en el minuto 0 con música o ambientación temática de videojuego?",
+      "¿Presentaste las reglas de la arena de forma lúdica (juego limpio, cooperación y respeto)?",
+      "¿Confirmaste que todos los estudiantes estuvieran conectados a la plataforma o servidor del juego?",
+      "¿Estableciste la meta de la sesión: desbloquear niveles resolviendo desafíos de programación?",
+      "¿Inyectaste entusiasmo y energía alta desde las primeras palabras de bienvenida?"
+    ],
+    keywords: [
+      "INICIO_ELECTRIZANTE",
+      "ARENA_DE_JUEGO",
+      "JUEGO_LIMPIO",
+      "AMBIENTACION_GAMER",
+      "ENERGIA_ALTA"
+    ],
+    tipICS: "Un arranque electrizante capta el 100% de atención del perfil gamer; el algoritmo ICS detecta el nivel de permanencia sin fugas de atención en los primeros 5 minutos.",
+    templates: {
+      cumple: "Inicio lleno de energía con temática gamer. Reglas claras y todos los alumnos conectados y listos para jugar.",
+      parcial: "Se explicó la dinámica pero hubo retraso de 4 minutos esperando a que un alumno abriera el juego.",
+      nocumple: "Inicio desganado o sin ambientación lúdica, tratando la sesión especial como una clase teórica ordinaria."
+    },
+    quickNoteTemplates: [
+      "Inicio lleno de energía con temática gamer. Reglas claras y todos los alumnos conectados y listos para jugar.",
+      "Se explicó la dinámica pero hubo retraso de 4 minutos esperando a que un alumno abriera el juego.",
+      "Inicio desganado o sin ambientación lúdica, tratando la sesión especial como una clase teórica ordinaria."
+    ]
+  },
+  {
+    id: "c-cg-narrativa",
+    category: "Narrativa y Storytelling",
+    title: "Narrativa inmersiva y retos gamificados",
+    description: "Construcción de una trama atractiva (escape room, misión espacial, hackathon) donde el código es la llave para avanzar.",
+    sessionTypes: ["codegame"],
+    questions: [
+      "¿Presentaste una historia envolvente (misión espacial, rescate cibernético, escape room de código)?",
+      "¿Los retos de programación estaban justificados por la trama y los personajes del juego?",
+      "¿Mantuviste vivo el rol de los alumnos como 'superagentes' o 'magos del código' durante la sesión?",
+      "¿Utilizaste elementos visuales, efectos sonoros o metáforas narrativas para cada desafío?",
+      "¿Adaptaste la historia a los intereses contemporáneos del grupo (Minecraft, Roblox, IA, etc.)?"
+    ],
+    keywords: [
+      "NARRATIVA_INMERSIVA",
+      "STORYTELLING_GAMER",
+      "MISION_TEMATICA",
+      "SUPERAGENTES_CODIGO",
+      "INVOLUCRAMIENTO_LUDICO"
+    ],
+    tipICS: "El storytelling estimula la concentración intrínseca de los niños, elevando las respuestas voluntarias en chat y micrófono, métrica principal del ICS de participación.",
+    templates: {
+      cumple: "Storytelling brillante: los alumnos se sintieron dentro de una aventura real programando para ganar.",
+      parcial: "Hubo historia al inicio pero se olvidó a la mitad de la clase convirtiéndose en ejercicios sueltos.",
+      nocumple: "Sin hilo narrativo ni elementos lúdicos; se presentaron ejercicios de código sin contexto divertido."
+    },
+    quickNoteTemplates: [
+      "Storytelling brillante: los alumnos se sintieron dentro de una aventura real programando para ganar.",
+      "Hubo historia al inicio pero se olvidó a la mitad de la clase convirtiéndose en ejercicios sueltos.",
+      "Sin hilo narrativo ni elementos lúdicos; se presentaron ejercicios de código sin contexto divertido."
+    ]
+  },
+  {
+    id: "c-cg-dinamica-equipos",
+    category: "Cooperación y Dinámica de Grupo",
+    title: "Dinámica de equipos y cooperación activa",
+    description: "Distribución de roles rotativos (estratega, tester, piloto) fomentando ayuda mutua y triunfos compartidos.",
+    sessionTypes: ["codegame"],
+    questions: [
+      "¿Organizaste a los alumnos en equipos equilibrados o en modo cooperativo contra el reto?",
+      "¿Asignaste roles claros y rotativos (el estratega, el tester, el programador en jefe)?",
+      "¿Fomentaste que los estudiantes se ayudaran entre sí compartiendo pistas y código por chat?",
+      "¿Supervisaste las salas o dinámicas para evitar que un solo miembro hiciera todo el trabajo?",
+      "¿Celebraste victorias colectivas más que victorias individuales egoístas?"
+    ],
+    keywords: [
+      "DINAMICA_EQUIPOS",
+      "COOPERACION_ACTIVA",
+      "ROLES_GAMIFICADOS",
+      "AYUDA_MUTUA",
+      "ESPIRITU_COLABORATIVO"
+    ],
+    tipICS: "El trabajo cooperativo previene la frustración del estudiante rezagado y distribuye la participación de forma homogénea, optimizando el índice de equidad en la auditoría QA.",
+    templates: {
+      cumple: "Gran espíritu de equipo: los niños colaboraron compartiendo pistas y celebraron juntos cada nivel superado.",
+      parcial: "Un alumno resolvió casi todo el reto antes que los demás sin esperar al resto de sus compañeros.",
+      nocumple: "Competencia agresiva o desorden donde los alumnos más tímidos quedaron excluidos de la dinámica."
+    },
+    quickNoteTemplates: [
+      "Gran espíritu de equipo: los niños colaboraron compartiendo pistas y celebraron juntos cada nivel superado.",
+      "Un alumno resolvió casi todo el reto antes que los demás sin esperar al resto de sus compañeros.",
+      "Competencia agresiva o desorden donde los alumnos más tímidos quedaron excluidos de la dinámica."
+    ]
+  },
+  {
+    id: "c-cg-desafios-progresivos",
+    category: "Diseño Instruccional Adaptativo",
+    title: "Retos de código de dificultad escalonada",
+    description: "Gradación de desafíos desde una victoria temprana en 5 minutos hasta el reto 'Boss' final para mantener el flujo óptimo.",
+    sessionTypes: ["codegame"],
+    questions: [
+      "¿El primer reto fue sencillo y rápido para generar una victoria temprana de confianza en 5 minutos?",
+      "¿La dificultad aumentó de forma progresiva según los alumnos fueron dominando los conceptos?",
+      "¿Tuviste preparados desafíos 'Boss / Jefe Final' para los alumnos con ritmo más avanzado?",
+      "¿Ofreciste pistas escalonadas sin dar la respuesta completa ante alumnos atascados?",
+      "¿Los retos exigieron aplicar pensamiento lógico real (condicionales, bucles, coordenadas)?"
+    ],
+    keywords: [
+      "DIFICULTAD_ESCALONADA",
+      "VICTORIA_TEMPRANA",
+      "RETO_JEFE_FINAL",
+      "SCAFFOLDING_LUDICO",
+      "LOGICA_APLICADA"
+    ],
+    tipICS: "La dificultad progresiva mantiene al alumno en estado de 'Flow' (ni aburrido ni sobrepasado), métrica clave para evitar deserciones por frustración silenciosa.",
+    templates: {
+      cumple: "Retos perfectamente balanceados. Victoria temprana rápida y desafío final que exigió lo mejor de todos.",
+      parcial: "Un reto intermedio resultó demasiado difícil y detuvo a varios alumnos durante más de 8 minutos.",
+      nocumple: "Retos mal calibrados: o fueron excesivamente fáciles o tan difíciles que generaron frustración."
+    },
+    quickNoteTemplates: [
+      "Retos perfectamente balanceados. Victoria temprana rápida y desafío final que exigió lo mejor de todos.",
+      "Un reto intermedio resultó demasiado difícil y detuvo a varios alumnos durante más de 8 minutos.",
+      "Retos mal calibrados: o fueron excesivamente fáciles o tan difíciles que generaron frustración."
+    ]
+  },
+  {
+    id: "c-cg-monitoreo-vivo",
+    category: "Soporte Técnico en Vivo",
+    title: "Monitoreo en vivo y asistencia rápida en batalla",
+    description: "Inspección constante de la arena de juego para rescatar alumnos con fallos técnicos en menos de 60 segundos.",
+    sessionTypes: ["codegame"],
+    questions: [
+      "¿Monitoreaste los tableros o pantallas de todos los participantes sin perder la visión grupal?",
+      "¿Interviniste en menos de 60 segundos ante caídas de conexión o bugs inesperados?",
+      "¿Utilizaste un lenguaje de 'asistencia de combate' en lugar de regaño o reproche técnico?",
+      "¿Mantuviste la sesión en marcha para el grupo mientras rescatabas técnicamente a un jugador?",
+      "¿Comprobaste que los alumnos tuvieran sus proyectos funcionales para la prueba final?"
+    ],
+    keywords: [
+      "MONITOREO_EN_VIVO",
+      "ASISTENCIA_BATALLA",
+      "RESPUESTA_60_SEG",
+      "PLAN_DE_RESCATE",
+      "CONTINUIDAD_OPERATIVA"
+    ],
+    tipICS: "En sesiones Code & Game, los tiempos muertos técnicos de más de 2 minutos reducen la percepción de calidad en un 50%; la asistencia ágil mantiene el ICS arriba de 95%.",
+    templates: {
+      cumple: "Monitoreo impecable en vivo. Errores y bugs técnicos solucionados en segundos sin pausar la diversión.",
+      parcial: "Un fallo de pantalla de un alumno retrasó la ronda de retos durante un par de minutos para todos.",
+      nocumple: "El tutor se ausentó de la moderación por resolver un problema técnico individual abandonando al grupo."
+    },
+    quickNoteTemplates: [
+      "Monitoreo impecable en vivo. Errores y bugs técnicos solucionados en segundos sin pausar la diversión.",
+      "Un fallo de pantalla de un alumno retrasó la ronda de retos durante un par de minutos para todos.",
+      "El tutor se ausentó de la moderación por resolver un problema técnico individual abandonando al grupo."
+    ]
+  },
+  {
+    id: "c-cg-puntuacion-transparente",
+    category: "Gamificación y Transparencia",
+    title: "Sistema de puntos y ranking transparente",
+    description: "Mantenimiento de un marcador visible que premia creatividad, esfuerzo y resolución de bugs sin generar frustración.",
+    sessionTypes: ["codegame"],
+    questions: [
+      "¿Explicaste de forma clara y transparente cómo se ganan los puntos de juego y bonificaciones?",
+      "¿Otorgaste puntos tanto por resolver el código como por creatividad y trabajo en equipo?",
+      "¿Actualizaste el marcador o ranking en vivo en momentos estratégicos de la sesión?",
+      "¿Evitaste penalizaciones o pérdida de puntos que desmotivaran a los participantes?",
+      "¿Aseguraste que todos los alumnos acumularan puntos y sintieran que estaban sumando al marcador?"
+    ],
+    keywords: [
+      "SISTEMA_DE_PUNTOS",
+      "RANKING_TRANSPARENTE",
+      "PUNTOS_CREATIVIDAD",
+      "BONIFICACIONES_EXTRA",
+      "GAMIFICACION_JUSTA"
+    ],
+    tipICS: "Un sistema de puntos inclusivo que premia el esfuerzo y no solo la velocidad evita que los lentos se rindan, resguardando la métrica de participación equitativa en auditorías.",
+    templates: {
+      cumple: "Puntuación visible, justa y emocionante. Todos sumaron puntos y compitieron sanamente con entusiasmo.",
+      parcial: "El marcador no se actualizó periódicamente, perdiendo impacto motivacional a mitad de la sesión.",
+      nocumple: "Puntuaciones confusas o injustas que generaron reclamos o desmotivaron a los alumnos rezagados."
+    },
+    quickNoteTemplates: [
+      "Puntuación visible, justa y emocionante. Todos sumaron puntos y compitieron sanamente con entusiasmo.",
+      "El marcador no se actualizó periódicamente, perdiendo impacto motivacional a mitad de la sesión.",
+      "Puntuaciones confusas o injustas que generaron reclamos o desmotivaron a los alumnos rezagados."
+    ]
+  },
+  {
+    id: "c-cg-festejo-logros",
+    category: "Refuerzo y Celebración",
+    title: "Reconocimiento de jugadas maestras y creatividad",
+    description: "Narración estilo caster gamer ensalzando las mejores tácticas de código y otorgando títulos honoríficos.",
+    sessionTypes: ["codegame"],
+    questions: [
+      "¿Hiciste comentarios de caster/relator deportivo destacando las mejores soluciones de código?",
+      "¿Reconociste jugadas creativas inesperadas que los niños implementaron en sus proyectos?",
+      "¿Otorgaste títulos honoríficos divertidos (ej. 'El francotirador del bucle', 'El hacker estratega')?",
+      "¿Promoviste aplausos o celebraciones virtuales cuando un equipo superó un reto difícil?",
+      "¿Hiciste sentir a cada alumno como un protagonista de la arena de juego?"
+    ],
+    keywords: [
+      "JUGADAS_MAESTRAS",
+      "CASTER_GAMER",
+      "TITULOS_HONORIFICOS",
+      "RECONOCIMIENTO_CREATIVO",
+      "OVACION_VIRTUAL"
+    ],
+    tipICS: "Narrar la sesión como un caster gamer eleva el nivel de engagement a cotas máximas; es el factor diferenciador que QA cataloga como excelencia docente Kodland.",
+    templates: {
+      cumple: "Narración electrizante de las jugadas. Títulos honoríficos que llenaron de orgullo y risas a los niños.",
+      parcial: "Se reconocieron los logros pero con tono neutro sin aprovechar el potencial de narración lúdica.",
+      nocumple: "Cero festejo de jugadas; la dinámica se sintió fría y monótona a pesar de ser un evento Code & Game."
+    },
+    quickNoteTemplates: [
+      "Narración electrizante de las jugadas. Títulos honoríficos que llenaron de orgullo y risas a los niños.",
+      "Se reconocieron los logros pero con tono neutro sin aprovechar el potencial de narración lúdica.",
+      "Cero festejo de jugadas; la dinámica se sintió fría y monótona a pesar de ser un evento Code & Game."
+    ]
+  },
+  {
+    id: "c-cg-gestion-ritmo",
+    category: "Gestión de Aula y Bienestar",
+    title: "Control de energía y pausas tácticas",
+    description: "Regulación de los picos de adrenalina con pausas de respiración y moderación sana de micrófonos.",
+    sessionTypes: ["codegame"],
+    questions: [
+      "¿Controlaste los picos de sobreexcitación manteniendo a los alumnos enfocados sin caos auditivo?",
+      "¿Implementaste una pausa táctica de 60 segundos para estiramiento o respiración de concentración?",
+      "¿Moderaste el uso del micrófono para que todos pudieran hablar por turnos sin gritos?",
+      "¿Mantuviste la adrenalina alta sin perder el objetivo pedagógico de aprendizaje de código?",
+      "¿Guiaste la transición suave del juego intenso hacia la consolidación y reflexión final?"
+    ],
+    keywords: [
+      "CONTROL_ENERGIA",
+      "PAUSA_TACTICA",
+      "MODERACION_MICROFONO",
+      "BIENESTAR_DIGITAL",
+      "ENFOQUE_PEDAGOGICO"
+    ],
+    tipICS: "Saber regular la energía evita que la sesión se torne caótica, garantizando que los inspectores de calidad evalúen positivamente el dominio de grupo del tutor.",
+    templates: {
+      cumple: "Excelente modulación de energía: adrenalina en los retos y serenidad para escuchar las explicaciones.",
+      parcial: "Momentos de exceso de ruido en micrófono que costó contener un par de veces durante los retos.",
+      nocumple: "Pérdida de control del grupo: gritos en micrófono y desorden generalizado que impidió avanzar."
+    },
+    quickNoteTemplates: [
+      "Excelente modulación de energía: adrenalina en los retos y serenidad para escuchar las explicaciones.",
+      "Momentos de exceso de ruido en micrófono que costó contener un par de veces durante los retos.",
+      "Pérdida de control del grupo: gritos en micrófono y desorden generalizado que impidió avanzar."
+    ]
+  },
+  {
+    id: "c-cg-podio-final",
+    category: "Cierre y Retención",
+    title: "Podio cooperativo, resumen y cliffhanger",
+    description: "Cierre festivo donde todos celebran victorias conjuntas, resumen relámpago de lógica y gancho para el próximo evento.",
+    sessionTypes: ["codegame"],
+    questions: [
+      "¿Presentaste el podio o marcador final destacando las fortalezas únicas de cada equipo o jugador?",
+      "¿Garantizaste que nadie se sintiera perdedor celebrando el logro colectivo de la misión?",
+      "¿Hiciste un resumen relámpago donde los alumnos mencionaron qué truco de código aprendieron hoy?",
+      "¿Lanzaste un adelanto o cliffhanger del próximo evento o módulo para mantener la expectativa alta?",
+      "¿Aseguraste que todos guardaran sus proyectos y se despidieran con satisfacción?"
+    ],
+    keywords: [
+      "PODIO_COOPERATIVO",
+      "RESUMEN_RELAMPAGO",
+      "CLIFFHANGER_GAMER",
+      "CIERRE_MEMORABLE",
+      "FIDELIZACION_KODLAND"
+    ],
+    tipICS: "Un podio donde todos ganan refuerza el vínculo emocional y deja al alumno esperando ansioso el próximo evento, blindando el ICS de continuidad.",
+    templates: {
+      cumple: "Podio épico con victoria compartida. Resumen de código claro y cliffhanger que dejó a todos pidiendo más.",
+      parcial: "Se dio el podio pero se descuidó el resumen pedagógico de los conceptos aprendidos.",
+      nocumple: "Cierre abrupto sin podio ni resumen, o dinámica competitiva que dejó a algunos niños tristes."
+    },
+    quickNoteTemplates: [
+      "Podio épico con victoria compartida. Resumen de código claro y cliffhanger que dejó a todos pidiendo más.",
+      "Se dio el podio pero se descuidó el resumen pedagógico de los conceptos aprendidos.",
+      "Cierre abrupto sin podio ni resumen, o dinámica competitiva que dejó a algunos niños tristes."
+    ]
+  },
+  {
+    id: "c-cg-metricas-asistencia",
+    category: "Gestión Administrativa y QA",
+    title: "Registro de asistencia, puntajes y reporte QA",
+    description: "Consolidación de puntajes, capturas de momentos estelares y reporte administrativo inmediato en la plataforma Kodland.",
+    sessionTypes: ["codegame"],
+    questions: [
+      "¿Registraste la asistencia y el puntaje alcanzado por cada alumno en el sistema de Kodland?",
+      "¿Tomaste capturas del marcador final y de los momentos estelares de la sesión?",
+      "¿Enviaste felicitaciones y resumen de la jornada en el chat del grupo o reporte a familias?",
+      "¿Reportaste al Team Lead cualquier alumno con dificultades técnicas o de integración detectadas?",
+      "¿Completaste la autoevaluación y el registro antes del cierre de tu jornada docente?"
+    ],
+    keywords: [
+      "REPORTE_CODE_GAME",
+      "REGISTRO_PUNTAJES",
+      "EVIDENCIAS_BATALLA",
+      "FEEDBACK_ESTELAR",
+      "QA_COMPLIANCE"
+    ],
+    tipICS: "El reporte exhaustivo de sesiones especiales demuestra profesionalismo y asegura que el alumno sea canalizado al curso regular más afín a su desempeño.",
+    templates: {
+      cumple: "Reporte completo con asistencia, mejores puntajes y capturas enviado puntualmente a plataforma.",
+      parcial: "Reporte enviado pero faltó registrar los puntajes individuales o las evidencias de los retos.",
+      nocumple: "Falta de reporte en sistema o registro extemporáneo que impidió el seguimiento de los alumnos."
+    },
+    quickNoteTemplates: [
+      "Reporte completo con asistencia, mejores puntajes y capturas enviado puntualmente a plataforma.",
+      "Reporte enviado pero faltó registrar los puntajes individuales o las evidencias de los retos.",
+      "Falta de reporte en sistema o registro extemporáneo que impidió el seguimiento de los alumnos."
     ]
   }
 ];
@@ -569,7 +1353,8 @@ function renderCriteriaList() {
       const matchDesc = c.description.toLowerCase().includes(q);
       const matchQuestions = c.questions.some(item => item.toLowerCase().includes(q));
       const matchKeywords = c.keywords.some(item => item.toLowerCase().includes(q));
-      return matchTitle || matchCat || matchDesc || matchQuestions || matchKeywords;
+      const matchTip = c.tipICS ? c.tipICS.toLowerCase().includes(q) : false;
+      return matchTitle || matchCat || matchDesc || matchQuestions || matchKeywords || matchTip;
     }
 
     return true;
@@ -640,6 +1425,12 @@ function renderCriteriaList() {
           ${criterion.keywords.map(kw => `<span class="keyword-badge">💬 ${kw}</span>`).join("")}
         </div>
 
+        <!-- Consejo Algoritmo ICS (tipICS) -->
+        ${criterion.tipICS ? `
+        <div class="criterion-tip-ics" style="margin-top:0.65rem; font-size:0.79rem; background:rgba(255, 214, 41, 0.12); border-left:3px solid #ffd629; padding:0.45rem 0.75rem; border-radius:4px; color:#374151; line-height:1.4;">
+          <strong style="color:#856404;">💡 Tip Algoritmo ICS:</strong> ${criterion.tipICS}
+        </div>` : ''}
+
         <!-- Acordeón Desplegable de Preguntas de Verificación -->
         <button class="questions-toggle-btn" onclick="toggleQuestions('${criterion.id}')">
           <span>${isQuestionsOpen ? '▲ Ocultar' : '▼ Ver'} Preguntas clave de verificación (${criterion.questions.length})</span>
@@ -656,12 +1447,12 @@ function renderCriteriaList() {
           <div class="notes-header-row">
             <span class="notes-label">Notas y Observaciones del Tutor:</span>
             <button class="btn-quick-note" onclick="insertQuickNote('${criterion.id}')">
-              ⚡ Insertar nota rápida predefinida
+              ⚡ Insertar plantilla predefinida
             </button>
           </div>
           <textarea 
             class="criterion-notes-input" 
-            placeholder="Añade una anotación sobre este criterio (ej. Mateo no encendió audio hasta el min 10)..."
+            placeholder="Añade una anotación sobre este criterio o usa el botón de plantilla rápida..."
             oninput="handleNoteInput('${criterion.id}', this.value)">${escapeHtml(currentNote)}</textarea>
         </div>
 
@@ -700,20 +1491,33 @@ window.handleNoteInput = function(criterionId, text) {
 
 window.insertQuickNote = function(criterionId) {
   const criterion = CRITERIA_DATABASE.find(c => c.id === criterionId);
-  if (!criterion || !criterion.quickNoteTemplates || criterion.quickNoteTemplates.length === 0) return;
+  if (!criterion) return;
 
-  // Seleccionar aleatoriamente una plantilla o ciclar
-  const randomTemplate = criterion.quickNoteTemplates[
-    Math.floor(Math.random() * criterion.quickNoteTemplates.length)
-  ];
+  const currentStatus = appState.criteriaStatus[criterionId];
+  let templateText = "";
+
+  if (criterion.templates) {
+    if (currentStatus && criterion.templates[currentStatus]) {
+      templateText = criterion.templates[currentStatus];
+    } else {
+      // Si no tiene estado marcado o es noaplica, tomar plantilla de cumple o aleatoria
+      templateText = criterion.templates.cumple || Object.values(criterion.templates)[0];
+    }
+  } else if (criterion.quickNoteTemplates && criterion.quickNoteTemplates.length > 0) {
+    templateText = criterion.quickNoteTemplates[
+      Math.floor(Math.random() * criterion.quickNoteTemplates.length)
+    ];
+  }
+
+  if (!templateText) return;
 
   const current = appState.criteriaNotes[criterionId] || "";
-  const updated = current ? `${current}\n• ${randomTemplate}` : `• ${randomTemplate}`;
+  const updated = current ? `${current}\n• ${templateText}` : `• ${templateText}`;
   
   appState.criteriaNotes[criterionId] = updated;
   saveCurrentState();
   renderCriteriaList();
-  showToast("Nota rápida añadida al criterio");
+  showToast("Plantilla rápida añadida al criterio");
 };
 
 // =============================================================================
