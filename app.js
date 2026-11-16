@@ -987,7 +987,7 @@ const CRITERIA_DATABASE = [
 
 const STORAGE_KEYS = {
   CURRENT_STATE: "team4_kodland_current_checklist",
-  HISTORY: "team4_kodland_history"
+  HISTORY: "team4_tutor_ics_companion_v1"
 };
 
 const appState = {
@@ -1045,7 +1045,10 @@ function saveCurrentState() {
 
 function loadHistory() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.HISTORY);
+    let raw = localStorage.getItem(STORAGE_KEYS.HISTORY);
+    if (!raw && localStorage.getItem("team4_kodland_history")) {
+      raw = localStorage.getItem("team4_kodland_history");
+    }
     if (raw) {
       appState.history = JSON.parse(raw);
     } else {
@@ -1164,10 +1167,22 @@ function setupEventListeners() {
     });
   }
 
-  // Historial: Exportar JSON y Limpiar
+  // Historial: Exportar CSV, Exportar JSON, Importar JSON y Limpiar
+  const btnExportCsv = document.getElementById("btnExportCsv");
+  if (btnExportCsv) {
+    btnExportCsv.addEventListener("click", handleExportCsv);
+  }
+
   const btnExport = document.getElementById("btnExportHistory");
   if (btnExport) {
     btnExport.addEventListener("click", handleExportHistory);
+  }
+
+  const btnImportTrigger = document.getElementById("btnImportJsonTrigger");
+  const fileInput = document.getElementById("importJsonFileInput");
+  if (btnImportTrigger && fileInput) {
+    btnImportTrigger.addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", handleImportJson);
   }
 
   const btnClear = document.getElementById("btnClearHistory");
@@ -1524,8 +1539,16 @@ window.insertQuickNote = function(criterionId) {
 };
 
 // =============================================================================
-// 8. HISTORIAL Y SEGUIMIENTO QA
+// 8. HISTORIAL Y SEGUIMIENTO QA (KODLAND OFICIAL)
 // =============================================================================
+
+function calculateSemaforo(score) {
+  const num = Number(score) || 0;
+  if (num <= 10) return { label: "Crítica", key: "critica", badgeClass: "badge-semaforo-critica", icon: "🔴" };
+  if (num <= 30) return { label: "Riesgo", key: "riesgo", badgeClass: "badge-semaforo-riesgo", icon: "🟠" };
+  if (num <= 70) return { label: "Atención", key: "atencion", badgeClass: "badge-semaforo-atencion", icon: "🟡" };
+  return { label: "Saludable", key: "saludable", badgeClass: "badge-semaforo-saludable", icon: "🟢" };
+}
 
 function handleSaveSessionToHistory() {
   const metrics = calculateICS();
@@ -1536,6 +1559,27 @@ function handleSaveSessionToHistory() {
   }
 
   const now = new Date();
+  const reportedIcsInput = document.getElementById("sessionIcsReportedInput");
+  const reportedIcsVal = reportedIcsInput && reportedIcsInput.value.trim() !== "" 
+    ? Math.max(1, Math.min(100, parseInt(reportedIcsInput.value, 10))) 
+    : null;
+
+  // El semáforo se calcula con el ICS reportado si existe, o con el score del checklist
+  const baseScoreForSemaforo = reportedIcsVal !== null ? reportedIcsVal : metrics.scorePercent;
+  const semaforoInfo = calculateSemaforo(baseScoreForSemaforo);
+
+  // Fecha de seguimiento automático a +14 días
+  const followUpTimestamp = now.getTime() + (14 * 24 * 60 * 60 * 1000);
+  const followUpDateObj = new Date(followUpTimestamp);
+  const followUpDateStr = followUpDateObj.toLocaleDateString("es-ES", { dateStyle: "short" });
+
+  // Recopilación de observaciones y notas del tutor
+  const notesEntries = Object.entries(appState.criteriaNotes || {}).filter(([_, txt]) => txt && txt.trim());
+  const compiledNotes = notesEntries.map(([cId, txt]) => {
+    const c = CRITERIA_DATABASE.find(item => item.id === cId);
+    return `[${c ? c.title : cId}]: ${txt.trim()}`;
+  }).join("\n");
+
   const sessionRecord = {
     id: "session_" + Date.now(),
     date: now.toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" }),
@@ -1543,11 +1587,18 @@ function handleSaveSessionToHistory() {
     group: appState.sessionGroup.trim() || "Grupo sin especificar",
     sessionType: appState.sessionType,
     scorePercent: metrics.scorePercent,
+    reportedIcs: reportedIcsVal,
+    semaforoLabel: semaforoInfo.label,
+    semaforoKey: semaforoInfo.key,
+    followUpTimestamp: followUpTimestamp,
+    followUpDate: followUpDateStr,
+    followUpClosed: false,
     cumple: metrics.cumple,
     parcial: metrics.parcial,
     nocumple: metrics.nocumple,
     noaplica: metrics.noaplica,
     total: metrics.total,
+    observaciones: compiledNotes,
     criteriaSnapshot: { ...appState.criteriaStatus },
     notesSnapshot: { ...appState.criteriaNotes }
   };
@@ -1555,7 +1606,9 @@ function handleSaveSessionToHistory() {
   appState.history.unshift(sessionRecord);
   saveHistoryToStorage();
   updateHistoryBadge();
-  showToast(`¡Sesión guardada en el historial con éxito! (${metrics.scorePercent}% ICS)`);
+
+  if (reportedIcsInput) reportedIcsInput.value = "";
+  showToast(`¡Sesión guardada! Semáforo: ${semaforoInfo.label} (${metrics.scorePercent}%) · Seguimiento fijado a 14 días`);
 }
 
 function updateHistoryBadge() {
@@ -1570,7 +1623,7 @@ function renderHistoryTab() {
   const emptyState = document.getElementById("historyEmptyState");
   const statTotal = document.getElementById("statTotalClasses");
   const statAvg = document.getElementById("statAvgScore");
-  const statPerfect = document.getElementById("statPerfectSessions");
+  const statPending = document.getElementById("statPendingFollowUps");
 
   if (!tbody) return;
 
@@ -1581,19 +1634,19 @@ function renderHistoryTab() {
     tbody.innerHTML = "";
     if (emptyState) emptyState.style.display = "block";
     if (statAvg) statAvg.textContent = "0%";
-    if (statPerfect) statPerfect.textContent = "0";
+    if (statPending) statPending.textContent = "0";
     return;
   }
 
   if (emptyState) emptyState.style.display = "none";
 
-  // Calcular promedios
+  // Calcular promedios y seguimientos pendientes
   const sumScores = appState.history.reduce((acc, item) => acc + (item.scorePercent || 0), 0);
   const avg = Math.round(sumScores / totalClasses);
-  const perfects = appState.history.filter(item => item.scorePercent === 100).length;
+  const pendingFollowUps = appState.history.filter(item => !item.followUpClosed).length;
 
   if (statAvg) statAvg.textContent = `${avg}%`;
-  if (statPerfect) statPerfect.textContent = perfects;
+  if (statPending) statPending.textContent = pendingFollowUps;
 
   const sessionTypeLabels = {
     normal: "Clase Normal",
@@ -1606,25 +1659,59 @@ function renderHistoryTab() {
     if (item.scorePercent >= 85) scoreClass = "badge-score-high";
     else if (item.scorePercent >= 60) scoreClass = "badge-score-mid";
 
+    // Semáforo calculado
+    const semScore = item.reportedIcs !== null && item.reportedIcs !== undefined ? item.reportedIcs : item.scorePercent;
+    const sem = calculateSemaforo(semScore);
+
+    // Seguimiento a 14 días
+    let followUpBadgeHtml = "";
+    if (item.followUpClosed) {
+      followUpBadgeHtml = `<span class="badge-followup badge-followup-closed" onclick="toggleFollowUpStatus('${item.id}')" title="Clic para alternar estado: Reabrir seguimiento">✓ Cerrado</span>`;
+    } else {
+      const targetTs = item.followUpTimestamp || (item.timestamp + (14 * 24 * 60 * 60 * 1000));
+      const diffDays = Math.ceil((targetTs - Date.now()) / (1000 * 60 * 60 * 24));
+      if (diffDays > 0) {
+        followUpBadgeHtml = `<span class="badge-followup badge-followup-pending" onclick="toggleFollowUpStatus('${item.id}')" title="Clic para marcar como cerrado (Fecha límite: ${item.followUpDate || '14 días'})">⏳ ${diffDays}d pendientes</span>`;
+      } else {
+        followUpBadgeHtml = `<span class="badge-followup badge-followup-overdue" onclick="toggleFollowUpStatus('${item.id}')" title="Caso vencido sin cierre formal. Clic para marcar como cerrado">🚨 Vencido (${Math.abs(diffDays)}d)</span>`;
+      }
+    }
+
+    let scoreColHtml = `<span class="badge-score ${scoreClass}">${item.scorePercent}%</span>`;
+    if (item.reportedIcs !== null && item.reportedIcs !== undefined) {
+      scoreColHtml += ` <small style="display:block; font-size:0.7rem; color:var(--text-secondary); margin-top:2px;">Oficial: ${item.reportedIcs}</small>`;
+    }
+
     return `
       <tr>
         <td><strong>${item.date}</strong></td>
         <td>${escapeHtml(item.group)}</td>
         <td><span class="badge-session-type">${sessionTypeLabels[item.sessionType] || item.sessionType}</span></td>
-        <td><span class="badge-score ${scoreClass}">${item.scorePercent}%</span></td>
+        <td>${scoreColHtml}</td>
         <td>
-          <small style="color:var(--text-secondary)">
-            ✓${item.cumple} | ⚠${item.parcial} | ✗${item.nocumple} | —${item.noaplica}
-          </small>
+          <span class="badge-semaforo ${sem.badgeClass}">
+            ${sem.icon} ${sem.label}
+          </span>
         </td>
+        <td>${followUpBadgeHtml}</td>
         <td>
-          <button class="btn-icon-action" onclick="viewHistoryDetail('${item.id}')" title="Ver detalle">👁️</button>
+          <button class="btn-icon-action" onclick="viewHistoryDetail('${item.id}')" title="Ver detalle completo">👁️</button>
+          <button class="btn-icon-action" onclick="toggleFollowUpStatus('${item.id}')" title="Alternar cierre de seguimiento">🔄</button>
           <button class="btn-icon-action" onclick="deleteHistoryItem('${item.id}')" title="Eliminar registro" style="color:var(--color-nocumple)">🗑️</button>
         </td>
       </tr>
     `;
   }).join("");
 }
+
+window.toggleFollowUpStatus = function(recordId) {
+  const item = appState.history.find(h => h.id === recordId);
+  if (!item) return;
+  item.followUpClosed = !item.followUpClosed;
+  saveHistoryToStorage();
+  renderHistoryTab();
+  showToast(item.followUpClosed ? "Seguimiento a 14 días marcado como CERRADO" : "Seguimiento reabierto como PENDIENTE");
+};
 
 window.viewHistoryDetail = function(recordId) {
   const item = appState.history.find(h => h.id === recordId);
@@ -1638,12 +1725,15 @@ window.viewHistoryDetail = function(recordId) {
 
   modalTitle.textContent = `Detalle: ${item.group} (${item.date})`;
 
+  const semScore = item.reportedIcs !== null && item.reportedIcs !== undefined ? item.reportedIcs : item.scorePercent;
+  const sem = calculateSemaforo(semScore);
+
   let notesHtml = "";
   const noteEntries = Object.entries(item.notesSnapshot || {});
   if (noteEntries.length > 0) {
     notesHtml = `
       <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid #e2e8f0;">
-        <h5 style="margin-bottom:0.5rem; font-size:0.9rem;">Observaciones registradas:</h5>
+        <h5 style="margin-bottom:0.5rem; font-size:0.9rem;">Observaciones registradas por criterio:</h5>
         <ul style="padding-left:1.2rem; font-size:0.82rem; color:var(--text-secondary);">
           ${noteEntries.map(([cId, text]) => {
             const criterion = CRITERIA_DATABASE.find(c => c.id === cId);
@@ -1658,9 +1748,13 @@ window.viewHistoryDetail = function(recordId) {
   modalBody.innerHTML = `
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1rem; font-size:0.85rem;">
       <div><strong>Tipo de Sesión:</strong> ${item.sessionType}</div>
-      <div><strong>ICS Calculado:</strong> ${item.scorePercent}%</div>
-      <div><strong>Criterios que Cumple:</strong> ${item.cumple}</div>
-      <div><strong>Cumplimiento Parcial:</strong> ${item.parcial}</div>
+      <div><strong>Checklist Score:</strong> ${item.scorePercent}%</div>
+      <div><strong>ICS Reportado:</strong> ${item.reportedIcs !== null && item.reportedIcs !== undefined ? item.reportedIcs : 'No registrado'}</div>
+      <div><strong>Semáforo Calculado:</strong> <span class="badge-semaforo ${sem.badgeClass}">${sem.icon} ${sem.label}</span></div>
+      <div><strong>Fecha Límite 14d:</strong> ${item.followUpDate || '14 días'}</div>
+      <div><strong>Estado Seguimiento:</strong> ${item.followUpClosed ? '✅ Cerrado' : '⏳ Pendiente'}</div>
+      <div><strong>Criterios Cumple:</strong> ${item.cumple}</div>
+      <div><strong>Criterios Parcial:</strong> ${item.parcial}</div>
       <div><strong>No Cumplidos:</strong> ${item.nocumple}</div>
       <div><strong>No Aplica (N/A):</strong> ${item.noaplica}</div>
     </div>
@@ -1679,6 +1773,67 @@ window.deleteHistoryItem = function(recordId) {
   }
 };
 
+function handleExportCsv() {
+  if (appState.history.length === 0) {
+    alert("No hay registros en el historial para exportar.");
+    return;
+  }
+
+  const headers = [
+    "ID",
+    "Fecha Registro",
+    "Grupo / Curso",
+    "Tipo de Sesion",
+    "Puntaje Checklist (%)",
+    "ICS Reportado Oficial",
+    "Semaforo Calculado",
+    "Fecha Limite Seguimiento (+14d)",
+    "Estado Seguimiento (14d)",
+    "Criterios Cumple",
+    "Criterios Parcial",
+    "Criterios No Cumple",
+    "Criterios NA",
+    "Observaciones"
+  ];
+
+  const rows = appState.history.map(item => {
+    const sem = calculateSemaforo(item.reportedIcs !== null && item.reportedIcs !== undefined ? item.reportedIcs : item.scorePercent);
+    const followStatus = item.followUpClosed ? "Cerrado" : "Pendiente";
+    const escapeCsv = (val) => {
+      if (val === null || val === undefined) return '""';
+      const str = String(val).replace(/"/g, '""');
+      return `"${str}"`;
+    };
+
+    return [
+      escapeCsv(item.id),
+      escapeCsv(item.date),
+      escapeCsv(item.group),
+      escapeCsv(item.sessionType),
+      escapeCsv(item.scorePercent),
+      escapeCsv(item.reportedIcs !== null && item.reportedIcs !== undefined ? item.reportedIcs : "N/D"),
+      escapeCsv(sem.label),
+      escapeCsv(item.followUpDate || "14 días"),
+      escapeCsv(followStatus),
+      escapeCsv(item.cumple),
+      escapeCsv(item.parcial),
+      escapeCsv(item.nocumple),
+      escapeCsv(item.noaplica),
+      escapeCsv(item.observaciones || "")
+    ].join(",");
+  });
+
+  const csvContent = "\uFEFF" + [headers.join(","), ...rows].join("\r\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `ICS_Historial_Kodland_${Date.now()}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast("Historial exportado en CSV (UTF-8 con BOM para Excel)");
+}
+
 function handleExportHistory() {
   if (appState.history.length === 0) {
     alert("No hay registros en el historial para exportar.");
@@ -1689,10 +1844,50 @@ function handleExportHistory() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `ICS_Historial_Kodland_${Date.now()}.json`;
+  a.download = `ICS_Backup_Kodland_${Date.now()}.json`;
   a.click();
   URL.revokeObjectURL(url);
-  showToast("Historial exportado en JSON");
+  showToast("Respaldo JSON exportado");
+}
+
+function handleImportJson(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!Array.isArray(parsed)) {
+        alert("El archivo JSON no tiene un formato válido de lista de sesiones.");
+        return;
+      }
+
+      const replace = confirm(
+        `Se encontraron ${parsed.length} registros en el archivo.\n\n` +
+        `¿Deseas REEMPLAZAR el historial actual con estos datos?\n` +
+        `(Presiona 'Aceptar' para reemplazar todo, o 'Cancelar' para COMBINAR con tus registros actuales).`
+      );
+
+      if (replace) {
+        appState.history = parsed;
+      } else {
+        const existingIds = new Set(appState.history.map(h => h.id));
+        const newRecords = parsed.filter(h => h && h.id && !existingIds.has(h.id));
+        appState.history = [...appState.history, ...newRecords];
+      }
+
+      saveHistoryToStorage();
+      renderHistoryTab();
+      updateHistoryBadge();
+      showToast(`Respaldo importado con éxito (${appState.history.length} sesiones totales)`);
+    } catch (err) {
+      alert("Error al leer el archivo JSON: " + err.message);
+    } finally {
+      event.target.value = "";
+    }
+  };
+  reader.readAsText(file);
 }
 
 function handleClearHistory() {

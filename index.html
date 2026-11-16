@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
   <!-- Header principal con identidad Kodland -->
@@ -78,6 +78,7 @@
 
             <div class="session-metadata">
               <input type="text" id="sessionGroupInput" class="form-input" placeholder="Ej. Grupo Python Martes 17:00 / Mateo Gómez" />
+              <input type="number" id="sessionIcsReportedInput" class="form-input" style="width: 140px;" placeholder="ICS Of. (1-100)" min="1" max="100" title="ICS Oficial reportado por Kodland (Opcional)" />
               <button id="btnResetChecklist" class="btn-secondary" title="Reiniciar checklist actual">
                 <span class="icon">🔄</span> Reiniciar
               </button>
@@ -711,14 +712,21 @@
         <header class="history-header">
           <div>
             <h2>Historial de Clases & Autoevaluaciones QA</h2>
-            <p>Registro local de tus sesiones guardadas para que analices tu progreso continuo y prepares tus reuniones con QA/Team Lead.</p>
+            <p>Registro local de tus sesiones guardadas para que analices tu progreso continuo, seguimiento a 14 días y prepares tus reuniones con QA/Team Lead.</p>
           </div>
           <div class="history-actions">
-            <button id="btnExportHistory" class="btn-secondary">
-              <span class="icon">📤</span> Exportar Datos (JSON)
+            <button id="btnExportCsv" class="btn-secondary" title="Exportar a CSV compatible con Excel UTF-8">
+              <span class="icon">📊</span> Exportar CSV
             </button>
-            <button id="btnClearHistory" class="btn-danger-outline">
-              <span class="icon">🗑️</span> Limpiar Historial
+            <button id="btnExportHistory" class="btn-secondary" title="Exportar respaldo completo en JSON">
+              <span class="icon">📤</span> Respaldo JSON
+            </button>
+            <button id="btnImportJsonTrigger" class="btn-secondary" title="Importar respaldo JSON">
+              <span class="icon">📥</span> Importar JSON
+            </button>
+            <input type="file" id="importJsonFileInput" accept=".json" style="display: none;" />
+            <button id="btnClearHistory" class="btn-danger-outline" title="Eliminar todos los registros locales">
+              <span class="icon">🗑️</span> Limpiar
             </button>
           </div>
         </header>
@@ -734,8 +742,8 @@
             <span class="stat-value" id="statAvgScore">0%</span>
           </div>
           <div class="stat-box">
-            <span class="stat-caption">Sesiones al 100%</span>
-            <span class="stat-value" id="statPerfectSessions">0</span>
+            <span class="stat-caption">Seguimientos Pendientes (14d)</span>
+            <span class="stat-value" id="statPendingFollowUps">0</span>
           </div>
         </div>
 
@@ -746,10 +754,11 @@
               <thead>
                 <tr>
                   <th>Fecha y Hora</th>
-                  <th>Grupo / Alumno</th>
+                  <th>Grupo / Curso</th>
                   <th>Tipo de Sesión</th>
-                  <th>ICS Estimado</th>
-                  <th>Desglose (C/P/NC)</th>
+                  <th>Score Checklist & ICS</th>
+                  <th>Semáforo Calculado</th>
+                  <th>Seguimiento (+14 días)</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
@@ -787,6 +796,6 @@
   <div id="toastContainer" class="toast-container"></div>
 
   <!-- Script principal -->
-  <script src="app.js"></script>
+  <script src="./app.js"></script>
 </body>
 </html>
