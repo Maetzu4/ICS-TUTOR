@@ -564,23 +564,46 @@ body {
   border-color: #202124;
 }
 
+.btn-toggle-all {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.btn-toggle-all:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+}
+
 /* ==========================================================================
-   CRITERIOS INTERACTIVOS (CARD DE CRITERIO)
+   CRITERIOS INTERACTIVOS (CARD DE CRITERIO EN MODO ACORDEÓN COMPACTO)
    ========================================================================== */
 .criteria-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .criterion-card {
   background: var(--card-bg);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-lg);
-  padding: 1.25rem 1.4rem;
+  padding: 0;
   box-shadow: var(--shadow-sm);
   transition: var(--transition);
   position: relative;
+  overflow: hidden;
 }
 
 .criterion-card:hover {
@@ -600,20 +623,36 @@ body {
 }
 .criterion-card.status-noaplica {
   border-left: 5px solid var(--color-noaplica);
-  opacity: 0.75;
+  opacity: 0.8;
 }
 
+/* Cabecera del criterio (siempre visible) */
 .criterion-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 1rem;
+  padding: 0.9rem 1.25rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s ease;
   flex-wrap: wrap;
+}
+
+.criterion-header:hover {
+  background-color: #fafbfc;
 }
 
 .criterion-title-area {
   flex: 1;
-  min-width: 250px;
+  min-width: 240px;
+}
+
+.criterion-header-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.15rem;
 }
 
 .criterion-category {
@@ -622,24 +661,49 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.6px;
   color: var(--text-muted);
+}
+
+.accordion-chevron {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 800;
+  transition: transform 0.2s ease, color 0.2s ease;
   display: inline-block;
-  margin-bottom: 0.2rem;
+}
+
+.criterion-card.is-expanded .accordion-chevron {
+  color: var(--text-primary);
 }
 
 .criterion-title {
-  font-size: 1.05rem;
+  font-size: 0.98rem;
   font-weight: 700;
   color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  line-height: 1.3;
+}
+
+/* Contenedor colapsable de detalles */
+.criterion-details-drawer {
+  display: none;
+  padding: 0 1.25rem 1.25rem 1.25rem;
+  border-top: 1px solid var(--border-subtle);
+  animation: slideDrawer 0.2s ease-in-out;
+}
+
+.criterion-details-drawer.open {
+  display: block;
+}
+
+@keyframes slideDrawer {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .criterion-desc {
-  font-size: 0.85rem;
+  font-size: 0.84rem;
   color: var(--text-secondary);
-  margin-top: 0.35rem;
-  line-height: 1.4;
+  margin-top: 0.85rem;
+  line-height: 1.45;
 }
 
 /* Selector de estado (Pills) */
@@ -723,46 +787,40 @@ body {
   gap: 0.25rem;
 }
 
-/* Sección Plegable: Preguntas clave de verificación */
-.questions-toggle-btn {
-  margin-top: 0.85rem;
-  background: none;
-  border: none;
-  color: #2563eb;
-  font-family: inherit;
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.2rem 0;
-  transition: var(--transition);
-}
-
-.questions-toggle-btn:hover {
-  text-decoration: underline;
-}
-
-.questions-panel {
-  display: none;
+.criterion-tip-ics {
   margin-top: 0.75rem;
+  font-size: 0.8rem;
+  background: rgba(255, 214, 41, 0.14);
+  border-left: 3px solid #ffd629;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  color: #374151;
+  line-height: 1.4;
+}
+
+.questions-section {
+  margin-top: 0.85rem;
   background-color: #fafbfc;
   border: 1px dashed var(--border-light);
   border-radius: var(--radius-md);
   padding: 0.85rem 1.1rem;
 }
 
-.questions-panel.open {
+.questions-section-title {
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
   display: block;
-  animation: fadeIn 0.2s ease-in-out;
+  margin-bottom: 0.5rem;
 }
 
 .questions-list {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.45rem;
 }
 
 .questions-list li {

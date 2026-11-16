@@ -135,6 +135,9 @@
               <button class="filter-btn" data-filter="pending">Pendientes</button>
               <button class="filter-btn" data-filter="completed">Completados</button>
             </div>
+            <button id="btnToggleAllCriteria" class="btn-toggle-all" type="button" title="Alternar entre vista compacta y detallada">
+              <span class="icon">↕️</span> <span id="toggleAllLabel">Expandir todo</span>
+            </button>
           </div>
 
           <!-- Lista de Criterios Interactivos -->
@@ -687,8 +690,8 @@
                 <td>Preguntas directas y amables: "Mateo, ayúdame a elegir si el salto es hacia arriba o hacia la derecha".</td>
               </tr>
               <tr>
-                <td>Ignorar a alumnos con cámara apagada o que no responden el chat.</td>
-                <td>Hacer chequeos suaves por nombre y pedir interacción lúdica por chat o emojis.</td>
+                <td>Ignorar a alumnos silenciosos o asumir erróneamente que quien no tiene cámara encendida no está participando.</td>
+                <td>Recordar que cámaras apagadas no restan puntos: facilitar interacción multicanal por micrófono, chat o emojis.</td>
               </tr>
               <tr>
                 <td>Resolverle el problema al alumno tomando control total de su pantalla.</td>

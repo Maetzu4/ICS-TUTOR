@@ -595,31 +595,31 @@ const CRITERIA_DATABASE = [
     id: "c-grad-foto-cierre",
     category: "Cierre y Comunidad",
     title: "Foto grupal, aplausos y despedida memorable",
-    description: "Captura de recuerdo con cámaras encendidas, gestos temáticos, micrófono abierto y despedida conmovedora.",
+    description: "Captura de recuerdo grupal con gestos temáticos, felicitaciones por micrófono o chat y despedida conmovedora.",
     sessionTypes: ["graduation"],
     questions: [
-      "¿Invitaste a todos los alumnos y padres a encender sus cámaras para la fotografía oficial de graduación?",
+      "¿Invitaste a todos los alumnos y familias a sumarse a la fotografía oficial de recuerdo y compartir felicitaciones?",
       "¿Coordinaste una pose divertida o gesto temático (ej. saludo de programadores, pulgares arriba)?",
-      "¿Capturaste múltiples fotografías asegurando que todos salieran bien iluminados y enfocados?",
+      "¿Capturaste múltiples fotografías asegurando que los nombres y proyectos quedaran registrados?",
       "¿Despediste la sesión con palabras de inspiración y agradecimiento sincero?",
-      "¿Permitiste un minuto final de micrófonos abiertos para felicitaciones espontáneas entre todos?"
+      "¿Permitiste un minuto final de micrófonos abiertos o chat festivo para felicitaciones espontáneas?"
     ],
     keywords: [
       "FOTO_GRUPAL",
-      "CAMARAS_ENCENDIDAS",
       "DESPEDIDA_MEMORABLE",
       "COMUNIDAD_KODLAND",
-      "APLAUSO_FINAL"
+      "APLAUSO_FINAL",
+      "MOMENTO_FAMILIAR"
     ],
-    tipICS: "La fotografía con cámaras encendidas y micrófonos abiertos crea sentido de pertenencia y comunidad, cerrando con la máxima puntuación en el factor humano del ICS.",
+    tipICS: "La fotografía grupal y la despedida festiva consolidan la experiencia emocional; recuerda que el algoritmo ICS mide presencia y participación por voz o chat/reacciones, por lo que las cámaras apagadas nunca restan puntos.",
     templates: {
-      cumple: "Cierre apoteósico: 100% de cámaras encendidas, foto grupal divertida y aplauso unánime de familias.",
-      parcial: "Se tomó la foto pero varias cámaras se quedaron apagadas sin mayor motivación del tutor.",
+      cumple: "Cierre apoteósico: foto grupal emotiva, participación entusiasta en chat y voz, y aplauso unánime de familias.",
+      parcial: "Se tomó la foto pero faltó invitar a las familias a unirse o no todos pudieron despedirse por voz o chat.",
       nocumple: "No se organizó fotografía grupal o la llamada se cerró de golpe tras la entrega de diplomas."
     },
     quickNoteTemplates: [
-      "Cierre apoteósico: 100% de cámaras encendidas, foto grupal divertida y aplauso unánime de familias.",
-      "Se tomó la foto pero varias cámaras se quedaron apagadas sin mayor motivación del tutor.",
+      "Cierre apoteósico: foto grupal emotiva, participación entusiasta en chat y voz, y aplauso unánime de familias.",
+      "Se tomó la foto pero faltó invitar a las familias a unirse o no todos pudieron despedirse por voz o chat.",
       "No se organizó fotografía grupal o la llamada se cerró de golpe tras la entrega de diplomas."
     ]
   },
@@ -996,7 +996,7 @@ const appState = {
   sessionGroup: "",
   criteriaStatus: {},      // { [id]: 'cumple' | 'parcial' | 'nocumple' | 'noaplica' }
   criteriaNotes: {},       // { [id]: string }
-  openQuestions: {},       // { [id]: boolean }
+  openCriteria: {},        // { [id]: boolean } (colapsado por defecto)
   filterStatus: "all",     // 'all' | 'pending' | 'completed'
   searchQuery: "",
   rescuePanelOpen: false,
@@ -1144,6 +1144,16 @@ function setupEventListeners() {
       renderCriteriaList();
     });
   });
+
+  // Botón Expandir / Colapsar todos los criterios
+  const btnToggleAll = document.getElementById("btnToggleAllCriteria");
+  if (btnToggleAll) {
+    btnToggleAll.addEventListener("click", () => {
+      if (typeof window.toggleAllCriteria === "function") {
+        window.toggleAllCriteria();
+      }
+    });
+  }
 
   // Acciones Rápidas de Rescate en Vivo (Toggle sidebar)
   const btnRescueToggle = document.getElementById("btnQuickRescueToggle");
@@ -1391,44 +1401,50 @@ function renderCriteriaList() {
 
   container.innerHTML = filteredCriteria.map(criterion => {
     const currentStatus = appState.criteriaStatus[criterion.id] || "";
-    const isQuestionsOpen = appState.openQuestions[criterion.id] || false;
+    const isCardOpen = !!appState.openCriteria[criterion.id];
     const currentNote = appState.criteriaNotes[criterion.id] || "";
 
     const statusCardClass = currentStatus ? `status-${currentStatus}` : "";
 
     return `
-      <article class="criterion-card ${statusCardClass}" id="card-${criterion.id}">
+      <article class="criterion-card ${statusCardClass} ${isCardOpen ? 'is-expanded' : 'is-collapsed'}" id="card-${criterion.id}">
         
-        <header class="criterion-header">
+        <header class="criterion-header" onclick="toggleCriterionAccordion('${criterion.id}', event)" title="Clic para desplegar u ocultar detalles">
           <div class="criterion-title-area">
-            <span class="criterion-category">${criterion.category}</span>
+            <div class="criterion-header-top">
+              <span class="criterion-category">${criterion.category}</span>
+              <span class="accordion-chevron" aria-hidden="true">${isCardOpen ? '▲' : '▼'}</span>
+            </div>
             <h4 class="criterion-title">
               <span>${criterion.title}</span>
             </h4>
-            <p class="criterion-desc">${criterion.description}</p>
           </div>
 
-          <!-- Selector de Estado Cuádruple -->
-          <div class="status-pill-group">
+          <!-- Selector de Estado Cuádruple (stop propagation para evitar toggle del acordeón al calificar) -->
+          <div class="status-pill-group" onclick="event.stopPropagation()">
             <button 
+              type="button"
               class="status-btn ${currentStatus === 'cumple' ? 'selected-cumple' : ''}" 
               onclick="setCriterionStatus('${criterion.id}', 'cumple')"
               title="Cumple a satisfacción">
               ✓ Cumple
             </button>
             <button 
+              type="button"
               class="status-btn ${currentStatus === 'parcial' ? 'selected-parcial' : ''}" 
               onclick="setCriterionStatus('${criterion.id}', 'parcial')"
               title="Cumplimiento parcial">
               ⚠ Parcial
             </button>
             <button 
+              type="button"
               class="status-btn ${currentStatus === 'nocumple' ? 'selected-nocumple' : ''}" 
               onclick="setCriterionStatus('${criterion.id}', 'nocumple')"
               title="No se evidenció en la sesión">
               ✗ No cumple
             </button>
             <button 
+              type="button"
               class="status-btn ${currentStatus === 'noaplica' ? 'selected-noaplica' : ''}" 
               onclick="setCriterionStatus('${criterion.id}', 'noaplica')"
               title="No aplica a esta sesión">
@@ -1437,49 +1453,83 @@ function renderCriteriaList() {
           </div>
         </header>
 
-        <!-- Palabras Clave ICS (Badges) -->
-        <div class="criterion-keywords">
-          <span class="keywords-label">Palabras Clave ICS:</span>
-          ${criterion.keywords.map(kw => `<span class="keyword-badge">💬 ${kw}</span>`).join("")}
-        </div>
+        <!-- Contenedor Colapsable de Detalles (.criterion-details-drawer) -->
+        <div class="criterion-details-drawer ${isCardOpen ? 'open' : ''}" id="drawer-${criterion.id}">
+          
+          <p class="criterion-desc">${criterion.description}</p>
 
-        <!-- Consejo Algoritmo ICS (tipICS) -->
-        ${criterion.tipICS ? `
-        <div class="criterion-tip-ics" style="margin-top:0.65rem; font-size:0.79rem; background:rgba(255, 214, 41, 0.12); border-left:3px solid #ffd629; padding:0.45rem 0.75rem; border-radius:4px; color:#374151; line-height:1.4;">
-          <strong style="color:#856404;">💡 Tip Algoritmo ICS:</strong> ${criterion.tipICS}
-        </div>` : ''}
-
-        <!-- Acordeón Desplegable de Preguntas de Verificación -->
-        <button class="questions-toggle-btn" onclick="toggleQuestions('${criterion.id}')">
-          <span>${isQuestionsOpen ? '▲ Ocultar' : '▼ Ver'} Preguntas clave de verificación (${criterion.questions.length})</span>
-        </button>
-
-        <div class="questions-panel ${isQuestionsOpen ? 'open' : ''}" id="questions-${criterion.id}">
-          <ul class="questions-list">
-            ${criterion.questions.map(q => `<li>${q}</li>`).join("")}
-          </ul>
-        </div>
-
-        <!-- Panel de Notas / Observaciones Predefinidas -->
-        <div class="notes-container">
-          <div class="notes-header-row">
-            <span class="notes-label">Notas y Observaciones del Tutor:</span>
-            <button class="btn-quick-note" onclick="insertQuickNote('${criterion.id}')">
-              ⚡ Insertar plantilla predefinida
-            </button>
+          <!-- Palabras Clave ICS (Badges) -->
+          <div class="criterion-keywords">
+            <span class="keywords-label">Palabras Clave ICS:</span>
+            ${criterion.keywords.map(kw => `<span class="keyword-badge">💬 ${kw}</span>`).join("")}
           </div>
-          <textarea 
-            class="criterion-notes-input" 
-            placeholder="Añade una anotación sobre este criterio o usa el botón de plantilla rápida..."
-            oninput="handleNoteInput('${criterion.id}', this.value)">${escapeHtml(currentNote)}</textarea>
+
+          <!-- Consejo Algoritmo ICS (tipICS) -->
+          ${criterion.tipICS ? `
+          <div class="criterion-tip-ics">
+            <strong>💡 Tip Algoritmo ICS:</strong> ${criterion.tipICS}
+          </div>` : ''}
+
+          <!-- Lista de Preguntas de Verificación -->
+          <div class="questions-section">
+            <span class="questions-section-title">Preguntas clave de verificación (${criterion.questions.length}):</span>
+            <ul class="questions-list">
+              ${criterion.questions.map(q => `<li>${q}</li>`).join("")}
+            </ul>
+          </div>
+
+          <!-- Panel de Notas / Observaciones Predefinidas -->
+          <div class="notes-container">
+            <div class="notes-header-row">
+              <span class="notes-label">Notas y Observaciones del Tutor:</span>
+              <button type="button" class="btn-quick-note" onclick="insertQuickNote('${criterion.id}')">
+                ⚡ Insertar plantilla predefinida
+              </button>
+            </div>
+            <textarea 
+              class="criterion-notes-input" 
+              placeholder="Añade una anotación sobre este criterio o usa el botón de plantilla rápida..."
+              oninput="handleNoteInput('${criterion.id}', this.value)">${escapeHtml(currentNote)}</textarea>
+          </div>
+
         </div>
 
       </article>
     `;
   }).join("");
+
+  updateToggleAllButtonLabel();
 }
 
 // Acciones sobre criterios expuestas a window
+window.toggleCriterionAccordion = function(criterionId, event) {
+  if (event && event.target && event.target.closest(".status-pill-group")) {
+    return;
+  }
+  appState.openCriteria[criterionId] = !appState.openCriteria[criterionId];
+  renderCriteriaList();
+};
+
+window.toggleAllCriteria = function() {
+  const activeCriteria = CRITERIA_DATABASE.filter(c => c.sessionTypes.includes(appState.sessionType));
+  const anyClosed = activeCriteria.some(c => !appState.openCriteria[c.id]);
+  
+  activeCriteria.forEach(c => {
+    appState.openCriteria[c.id] = anyClosed;
+  });
+  
+  renderCriteriaList();
+  showToast(anyClosed ? "Todos los criterios expandidos" : "Todos los criterios colapsados");
+};
+
+function updateToggleAllButtonLabel() {
+  const labelEl = document.getElementById("toggleAllLabel");
+  if (!labelEl) return;
+  const activeCriteria = CRITERIA_DATABASE.filter(c => c.sessionTypes.includes(appState.sessionType));
+  const anyClosed = activeCriteria.some(c => !appState.openCriteria[c.id]);
+  labelEl.textContent = anyClosed ? "Expandir todo" : "Colapsar todo";
+}
+
 window.setCriterionStatus = function(criterionId, status) {
   if (appState.criteriaStatus[criterionId] === status) {
     // Si da clic al mismo, lo deselecciona
@@ -1490,16 +1540,6 @@ window.setCriterionStatus = function(criterionId, status) {
   saveCurrentState();
   renderCriteriaList();
   updateScoreMetrics();
-};
-
-window.toggleQuestions = function(criterionId) {
-  appState.openQuestions[criterionId] = !appState.openQuestions[criterionId];
-  const panel = document.getElementById(`questions-${criterionId}`);
-  if (panel) {
-    panel.classList.toggle("open", appState.openQuestions[criterionId]);
-  }
-  // Re-render ligero para actualizar texto del botón
-  renderCriteriaList();
 };
 
 window.handleNoteInput = function(criterionId, text) {
