@@ -1188,6 +1188,9 @@ function setupEventListeners() {
       }
     });
   }
+
+  // Inicializar eventos del Simulador de Rating
+  setupSimulatorEvents();
 }
 
 // =============================================================================
@@ -1737,4 +1740,263 @@ function renderAll() {
   renderCriteriaList();
   updateScoreMetrics();
   updateHistoryBadge();
+  updateSimulator();
+}
+
+// =============================================================================
+// 10. SIMULADOR INTERACTIVO DE ESTADO DE RATING DEL TUTOR (KODLAND OFICIAL)
+// =============================================================================
+
+function setupSimulatorEvents() {
+  // Sincronización entre sliders y campos numéricos
+  const pairs = [
+    { slider: "simSliderCritica", num: "simNumCritica" },
+    { slider: "simSliderRiesgo", num: "simNumRiesgo" },
+    { slider: "simSliderAtencion", num: "simNumAtencion" },
+    { slider: "simSliderSaludable", num: "simNumSaludable" }
+  ];
+
+  pairs.forEach(pair => {
+    const sliderEl = document.getElementById(pair.slider);
+    const numEl = document.getElementById(pair.num);
+
+    if (sliderEl && numEl) {
+      sliderEl.addEventListener("input", () => {
+        numEl.value = sliderEl.value;
+        updateSimulator();
+      });
+
+      numEl.addEventListener("input", () => {
+        let val = parseInt(numEl.value, 10);
+        if (isNaN(val) || val < 0) val = 0;
+        if (val > 10) val = 10;
+        numEl.value = val;
+        sliderEl.value = val;
+        updateSimulator();
+      });
+    }
+  });
+
+  // Checkboxes de 4 revisiones extra
+  const auditChecks = [
+    "checkAuditBajada",
+    "checkAuditVariosGrupos",
+    "checkAuditSinGrupoDificil",
+    "checkAuditDosSemanas"
+  ];
+
+  auditChecks.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("change", () => {
+        updateSimulator();
+      });
+    }
+  });
+
+  // Presets rápidos
+  document.querySelectorAll(".btn-sim-preset").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const presetKey = btn.dataset.preset;
+      applySimulatorPreset(presetKey);
+    });
+  });
+}
+
+function applySimulatorPreset(presetKey) {
+  const configs = {
+    increible: {
+      critica: 0,
+      riesgo: 1,
+      atencion: 3,
+      saludable: 6,
+      audit: [false, false, false, false],
+      toast: "Cargado escenario: Tutor Increíble (≤25% riesgo, ≥50% saludable)"
+    },
+    bueno: {
+      critica: 0,
+      riesgo: 3,
+      atencion: 3,
+      saludable: 4,
+      audit: [false, false, false, false],
+      toast: "Cargado escenario: Tutor Bueno (≤30% riesgo general)"
+    },
+    ok: {
+      critica: 1,
+      riesgo: 3,
+      atencion: 3,
+      saludable: 3,
+      audit: [false, false, false, false],
+      toast: "Cargado escenario: Tutor OK (>30% riesgo en observación)"
+    },
+    malo: {
+      critica: 4,
+      riesgo: 2,
+      atencion: 2,
+      saludable: 2,
+      audit: [true, true, true, true],
+      toast: "Cargado escenario: Tutor Malo (≥30% críticas + 4 revisiones QA)"
+    }
+  };
+
+  const cfg = configs[presetKey];
+  if (!cfg) return;
+
+  const setVal = (sliderId, numId, val) => {
+    const s = document.getElementById(sliderId);
+    const n = document.getElementById(numId);
+    if (s) s.value = val;
+    if (n) n.value = val;
+  };
+
+  setVal("simSliderCritica", "simNumCritica", cfg.critica);
+  setVal("simSliderRiesgo", "simNumRiesgo", cfg.riesgo);
+  setVal("simSliderAtencion", "simNumAtencion", cfg.atencion);
+  setVal("simSliderSaludable", "simNumSaludable", cfg.saludable);
+
+  const auditChecks = [
+    "checkAuditBajada",
+    "checkAuditVariosGrupos",
+    "checkAuditSinGrupoDificil",
+    "checkAuditDosSemanas"
+  ];
+
+  auditChecks.forEach((id, idx) => {
+    const el = document.getElementById(id);
+    if (el) el.checked = cfg.audit[idx];
+  });
+
+  updateSimulator();
+  if (cfg.toast) showToast(cfg.toast);
+}
+
+function updateSimulator() {
+  const numCriticaEl = document.getElementById("simNumCritica");
+  const numRiesgoEl = document.getElementById("simNumRiesgo");
+  const numAtencionEl = document.getElementById("simNumAtencion");
+  const numSaludableEl = document.getElementById("simNumSaludable");
+
+  if (!numCriticaEl || !numRiesgoEl || !numAtencionEl || !numSaludableEl) return;
+
+  const critica = parseInt(numCriticaEl.value, 10) || 0;
+  const riesgo = parseInt(numRiesgoEl.value, 10) || 0;
+  const atencion = parseInt(numAtencionEl.value, 10) || 0;
+  const saludable = parseInt(numSaludableEl.value, 10) || 0;
+
+  const total = critica + riesgo + atencion + saludable;
+
+  // Actualizar indicador de total
+  const totalIndicator = document.getElementById("simTotalClassesIndicator");
+  if (totalIndicator) {
+    totalIndicator.textContent = `Total: ${total} / 10 clases`;
+    if (total === 10) {
+      totalIndicator.style.backgroundColor = "#ecfdf5";
+      totalIndicator.style.color = "#047857";
+    } else {
+      totalIndicator.style.backgroundColor = "#fffbeb";
+      totalIndicator.style.color = "#b45309";
+    }
+  }
+
+  // Cálculos porcentuales
+  const base = total > 0 ? total : 1;
+  const pctCritica = (critica / base) * 100;
+  const pctRiesgo = (riesgo / base) * 100;
+  const pctAtencion = (atencion / base) * 100;
+  const pctSaludable = (saludable / base) * 100;
+  const pctCritRiesgo = ((critica + riesgo) / base) * 100;
+
+  // Actualizar barra apilada
+  const barCritica = document.getElementById("simBarCritica");
+  const barRiesgo = document.getElementById("simBarRiesgo");
+  const barAtencion = document.getElementById("simBarAtencion");
+  const barSaludable = document.getElementById("simBarSaludable");
+
+  if (barCritica) barCritica.style.width = `${pctCritica}%`;
+  if (barRiesgo) barRiesgo.style.width = `${pctRiesgo}%`;
+  if (barAtencion) barAtencion.style.width = `${pctAtencion}%`;
+  if (barSaludable) barSaludable.style.width = `${pctSaludable}%`;
+
+  // Actualizar chips de métricas
+  const chipCritRiesgo = document.getElementById("chipPctCritRiesgo");
+  const chipSaludables = document.getElementById("chipPctSaludables");
+  const chipCriticas = document.getElementById("chipPctCriticas");
+
+  if (chipCritRiesgo) chipCritRiesgo.textContent = `${Math.round(pctCritRiesgo)}%`;
+  if (chipSaludables) chipSaludables.textContent = `${Math.round(pctSaludable)}%`;
+  if (chipCriticas) chipCriticas.textContent = `${Math.round(pctCritica)}%`;
+
+  // 4 Revisiones extra para estado Malo
+  const checkBajada = document.getElementById("checkAuditBajada")?.checked || false;
+  const checkVariosGrupos = document.getElementById("checkAuditVariosGrupos")?.checked || false;
+  const checkSinGrupo = document.getElementById("checkAuditSinGrupoDificil")?.checked || false;
+  const checkDosSemanas = document.getElementById("checkAuditDosSemanas")?.checked || false;
+
+  const all4AuditChecked = checkBajada && checkVariosGrupos && checkSinGrupo && checkDosSemanas;
+
+  // Resaltar caja de auditoría si críticas >= 30%
+  const extraAuditBox = document.getElementById("extraAuditBox");
+  if (extraAuditBox) {
+    extraAuditBox.classList.toggle("highlight-audit", pctCritica >= 30);
+  }
+
+  // ALGORITMO OFICIAL DE RATING KODLAND:
+  // 1. "Increíble": <= 25% Críticas/Riesgo y >= 50% Saludables.
+  // 2. "Bueno": <= 30% Críticas/Riesgo (sin llegar a Increíble).
+  // 3. "Malo": >= 30% Críticas + confirmación de las 4 revisiones extra.
+  // 4. "OK": > 30% Críticas/Riesgo (o >= 30% Críticas sin cumplir las 4 revisiones extra).
+
+  let ratingWord = "OK";
+  let ratingClass = "rating-ok";
+  let explanation = "";
+  let actionTitle = "⚡ Recomendación Pedagógica";
+  let actionDesc = "";
+
+  if (pctCritica >= 30 && all4AuditChecked) {
+    ratingWord = "MALO";
+    ratingClass = "rating-malo";
+    explanation = "Tienes ≥ 30% de clases Críticas y se confirman las 4 revisiones extra de auditoría QA.";
+    actionTitle = "🚨 Sesión de Coaching Requerida";
+    actionDesc = "Según el protocolo oficial de Kodland, se coordinará una sesión 1:1 con tu Team Lead para auditar grabaciones y aplicar un plan de rescate pedagógico.";
+  } else if (pctCritRiesgo <= 25 && pctSaludable >= 50) {
+    ratingWord = "INCREÍBLE";
+    ratingClass = "rating-increible";
+    explanation = "Cumples con ≤ 25% de clases Críticas/Riesgo y al menos 50% de clases Saludables.";
+    actionTitle = "🌟 Nivel de Excelencia Kodland";
+    actionDesc = "¡Felicitaciones! Cumples con los estándares más altos de retención. Eres candidato para bonificaciones de ICS y prioridad en apertura de nuevos grupos.";
+  } else if (pctCritRiesgo <= 30) {
+    ratingWord = "BUENO";
+    ratingClass = "rating-bueno";
+    explanation = "Mantienes ≤ 30% de clases Críticas/Riesgo (buena estabilidad general).";
+    actionTitle = "🚀 Muy cerca de Increíble";
+    actionDesc = "Tu ritmo de clase es confiable. Para subir a Increíble, enfócate en elevar tus clases Saludables al 50% cuidando la regla 70/30 y el cliffhanger final.";
+  } else {
+    // Caso OK
+    ratingWord = "OK";
+    ratingClass = "rating-ok";
+    if (pctCritica >= 30 && !all4AuditChecked) {
+      explanation = "Tienes ≥ 30% de clases Críticas pero NO se cumplen las 4 revisiones de auditoría QA. Por principio de justicia (Fairness), tu calificación se protege y se mantiene en OK.";
+      actionTitle = "⚠️ En Observación de Calidad";
+      actionDesc = "No estás en estado Malo gracias a las reglas de protección al tutor, pero necesitas corregir la dinámica en el grupo crítico antes de la próxima auditoría semanal.";
+    } else {
+      explanation = `Superas el 30% de clases en zona Crítica/Riesgo (${Math.round(pctCritRiesgo)}%).`;
+      actionTitle = "⚠️ Ajuste de Dinámicas Necesario";
+      actionDesc = "Aplica con urgencia las técnicas de rescate: Micrófono Dorado con preguntas cerradas A/B y verificación de pantallas cada 5 minutos para rescatar la atención.";
+    }
+  }
+
+  // Actualizar DOM
+  const ratingBadgeText = document.getElementById("ratingBadgeText");
+  const ratingExplanationText = document.getElementById("ratingExplanationText");
+  const ratingDisplayCard = document.getElementById("ratingDisplayCard");
+  const ratingActionTitle = document.getElementById("ratingActionTitle");
+  const ratingActionDesc = document.getElementById("ratingActionDesc");
+
+  if (ratingBadgeText) ratingBadgeText.textContent = ratingWord;
+  if (ratingExplanationText) ratingExplanationText.textContent = explanation;
+  if (ratingDisplayCard) {
+    ratingDisplayCard.className = `rating-display-card ${ratingClass}`;
+  }
+  if (ratingActionTitle) ratingActionTitle.textContent = actionTitle;
+  if (ratingActionDesc) ratingActionDesc.textContent = actionDesc;
 }
